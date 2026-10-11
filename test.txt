@@ -1,0 +1,38 @@
+// Lexer test program
+CONSTANT MaxScore = 100
+DECLARE Names : ARRAY[1:30] OF STRING
+DECLARE Grid : ARRAY[1:3,
+                     1:3] OF CHAR
+DECLARE Start : DATE
+
+Start ← 02/01/2005
+Grid[2, 3] ← 'X'
+Total <- 0
+
+FUNCTION Max(Number1 : INTEGER, Number2 : INTEGER) RETURNS INTEGER
+   IF Number1 > Number2
+      THEN
+         RETURN Number1
+   ELSE
+      RETURN Number2
+   ENDIF
+ENDFUNCTION
+
+FOR Index ← 1 TO 30 STEP 1
+   Total ← Total +
+           Index * 2
+NEXT Index
+
+IF X<-1 THEN
+   OUTPUT "Average: ", Total / 30, " (", 4.7, ")"
+ENDIF
+
+CASE OF Move
+   'W' : Position ← Position − 10
+   'A' TO 'D' : CALL Strafe()
+   OTHERWISE : CALL Beep
+ENDCASE
+
+WHILE Index <= 10 AND NOT Found
+   Index ← Index + 1
+ENDWHILE
