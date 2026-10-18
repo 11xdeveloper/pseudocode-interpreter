@@ -7,6 +7,7 @@
 #include <variant>
 
 #include "AstPrinter.h"
+#include "Environment.h"
 #include "Lexer.h"
 #include "Parser.h"
 #include "Types.h"
@@ -51,7 +52,7 @@ void printTokens(const std::vector<Token>& tokens) {
 
 // Usage: PseudocodeInterpreter [--tokens | --ast | --types] [file]
 // For now this lexes and parses the file (test.txt by default), checks its
-// type definitions, and prints the AST, the token stream (--tokens) or the
+// type and subroutine definitions, and prints the AST, the token stream (--tokens) or the
 // resolved types (--types).
 int main(int argc, char* argv[]) {
 #ifdef _WIN32
@@ -103,7 +104,10 @@ int main(int argc, char* argv[]) {
 		TypeTable types;
 		if (!lexer.hasErrors() && !parser.hasErrors()) {
 			types.build(program);
+			Environment environment(program, types, {});
+			// Read after the environment exists: resolving signatures adds to the type table's diagnostics.
 			diagnostics.insert(diagnostics.end(), types.diagnostics().begin(), types.diagnostics().end());
+			diagnostics.insert(diagnostics.end(), environment.diagnostics().begin(), environment.diagnostics().end());
 		}
 
 		std::cout << (show == Show::Types ? types.dump() : printAst(program));
