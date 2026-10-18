@@ -1,10 +1,14 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <variant>
 
+#include "AstPrinter.h"
 #include "Lexer.h"
+#include "Parser.h"
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -28,24 +32,7 @@ std::string describeValue(const LiteralValue& value) {
 	return std::visit(Visitor{}, value);
 }
 
-}
-
-// For now this only runs the lexer on test.txt and prints the token stream.
-int main() {
-#ifdef _WIN32
-	SetConsoleOutputCP(CP_UTF8);
-#endif
-	std::string fileName = "test.txt";
-	std::ifstream file(fileName, std::ios::binary);
-	if (!file) {
-		std::cerr << "Cannot open " << fileName << "\n";
-		return 1;
-	}
-	std::string source((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-
-	Lexer lexer(source);
-	std::vector<Token> tokens = lexer.tokenize();
-
+void printTokens(const std::vector<Token>& tokens) {
 	for (const Token& token : tokens) {
 		std::cout << token.line << ':' << token.column << '\t' << tokenTypeName(token.type);
 		if (token.type == TokenType::Identifier) {
@@ -57,9 +44,64 @@ int main() {
 		}
 		std::cout << '\n';
 	}
+}
 
-	for (const Diagnostic& diagnostic : lexer.diagnostics()) {
-		std::cerr << formatDiagnostic(diagnostic, fileName, source);
+}
+
+// Usage: PseudocodeInterpreter [--tokens | --ast] [file]
+// For now this lexes and parses the file (test.txt by default) and prints the
+// AST, or with --tokens the token stream.
+int main(int argc, char* argv[]) {
+#ifdef _WIN32
+	SetConsoleOutputCP(CP_UTF8);
+#endif
+	bool showTokens = false;
+	std::string fileName = "test.txt";
+	for (int i = 1; i < argc; ++i) {
+		std::string_view arg = argv[i];
+		if (arg == "--tokens") {
+			showTokens = true;
+		}
+		else if (arg == "--ast") {
+			showTokens = false;
+		}
+		else if (arg.starts_with("--")) {
+			std::cerr << "Unknown option " << arg << "\nUsage: PseudocodeInterpreter [--tokens | --ast] [file]\n";
+			return 1;
+		}
+		else {
+			fileName = arg;
+		}
 	}
-	return lexer.hasErrors() ? 1 : 0;
+
+	std::ifstream file(fileName, std::ios::binary);
+	if (!file) {
+		std::cerr << "Cannot open " << fileName << "\n";
+		return 1;
+	}
+	std::string source((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+	Lexer lexer(source);
+	std::vector<Token> tokens = lexer.tokenize();
+	std::vector<Diagnostic> diagnostics = lexer.diagnostics();
+
+	if (showTokens) {
+		printTokens(tokens);
+	}
+	else {
+		Parser parser(std::move(tokens));
+		Program program = parser.parse();
+		diagnostics.insert(diagnostics.end(), parser.diagnostics().begin(), parser.diagnostics().end());
+		std::cout << printAst(program);
+	}
+
+	std::stable_sort(diagnostics.begin(), diagnostics.end(), [](const Diagnostic& a, const Diagnostic& b) {
+		return a.line != b.line ? a.line < b.line : a.column < b.column;
+	});
+	bool hasErrors = false;
+	for (const Diagnostic& diagnostic : diagnostics) {
+		std::cerr << formatDiagnostic(diagnostic, fileName, source);
+		hasErrors = hasErrors || diagnostic.severity == Severity::Error;
+	}
+	return hasErrors ? 1 : 0;
 }
