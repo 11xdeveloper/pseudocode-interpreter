@@ -1,0 +1,2 @@
+// The smallest program: OUTPUT joins its values with no separator.
+OUTPUT "Hello, ", "world", "!"

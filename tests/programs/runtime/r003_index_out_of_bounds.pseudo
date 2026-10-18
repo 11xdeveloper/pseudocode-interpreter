@@ -1,0 +1,8 @@
+// Spec 12.1's example: the caret points at the index, and the call chain is shown.
+DECLARE Names : ARRAY[1:30] OF STRING
+CALL ClearNames
+PROCEDURE ClearNames
+   FOR I ← 1 TO 31
+Names[I] ← ""
+   NEXT I
+ENDPROCEDURE

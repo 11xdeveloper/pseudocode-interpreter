@@ -1,0 +1,11 @@
+// STDIN: 42
+// STDIN: 2.5
+// STDIN-CRLF: W
+// STDIN: Hello there
+// INPUT into undeclared names takes the type from the text (spec 7.2), and a
+// carriage return from Windows input is dropped.
+INPUT Count
+INPUT Price
+INPUT Move
+INPUT Greeting
+OUTPUT Count + 1, " ", Price * 2, " ", Move = 'W', " ", LENGTH(Greeting)

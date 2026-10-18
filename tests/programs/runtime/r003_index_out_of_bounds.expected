@@ -1,0 +1,7 @@
+exit: 2
+--- stdout
+--- stderr
+r003_index_out_of_bounds.pseudo:6:7: Runtime error R003: Index 31 is outside the bounds of Names [1:30]
+   Names[I] ← ""
+         ^
+   in procedure ClearNames (line 6), called from line 3
