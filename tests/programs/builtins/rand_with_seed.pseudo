@@ -1,0 +1,13 @@
+// ARGS: --seed 42
+// --seed makes RAND repeat, with the same numbers on every platform (spec 9.2).
+OUTPUT RAND(100)
+OUTPUT RAND(100)
+InRange ← TRUE
+FOR I ← 1 TO 1000
+   R ← RAND(6)
+   IF R < 0 OR R >= 6 THEN
+      InRange ← FALSE
+   ENDIF
+NEXT I
+OUTPUT "1000 rolls in [0, 6): ", InRange
+OUTPUT "A dice roll: ", INT(RAND(6)) + 1

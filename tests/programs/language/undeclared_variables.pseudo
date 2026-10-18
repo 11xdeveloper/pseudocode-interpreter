@@ -1,0 +1,15 @@
+// Undeclared variables (spec 5.1): created by their first assignment, local inside subroutines.
+Counter ← 0
+CALL Bump
+CALL Bump
+OUTPUT "Counter = ", Counter
+CALL MakeTemp
+Temp ← "global"
+OUTPUT "Temp = ", Temp
+PROCEDURE Bump
+   Counter ← Counter + 1
+ENDPROCEDURE
+PROCEDURE MakeTemp
+   Temp ← 99
+   OUTPUT "local Temp = ", Temp
+ENDPROCEDURE

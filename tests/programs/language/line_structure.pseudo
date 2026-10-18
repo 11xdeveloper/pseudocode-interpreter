@@ -1,0 +1,16 @@
+// Line continuations, THEN on its own line, <- and Unicode aliases (spec 2.4, 2.6).
+X <- -2
+IF X<-1
+   THEN
+      OUTPUT "X<-1 means X < -1"
+ENDIF
+Total ← 1 +
+        2 +
+        3
+OUTPUT "Total = ", Total
+Y ← 10 − 4
+OUTPUT "En and minus signs: ", Y, " ", 10 – 4
+IF Y ≠ 5 AND Y ≥ 6 AND Y ≤ 6 THEN
+   OUTPUT "≠ ≥ ≤ work"
+ENDIF
+OUTPUT “quotes from a PDF”, ‘!’

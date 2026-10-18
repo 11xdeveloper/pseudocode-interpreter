@@ -1,0 +1,10 @@
+// R010: READFILE after the last line.
+OPENFILE "Two.txt" FOR WRITE
+WRITEFILE "Two.txt", "one"
+WRITEFILE "Two.txt", "two"
+CLOSEFILE "Two.txt"
+OPENFILE "Two.txt" FOR READ
+READFILE "Two.txt", A
+READFILE "Two.txt", B
+OUTPUT A, " ", B
+READFILE "Two.txt", C

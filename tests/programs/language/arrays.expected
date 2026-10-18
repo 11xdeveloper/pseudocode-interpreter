@@ -1,0 +1,6 @@
+exit: 0
+--- stdout
+Grid[2,3] = O, Saved[1,2] = X
+-3.0 0.0 3.0
+Bounds from a variable: 16
+--- stderr

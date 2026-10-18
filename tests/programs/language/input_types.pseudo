@@ -1,0 +1,21 @@
+// STDIN: 15
+// STDIN: -2.5
+// STDIN: q
+// STDIN:
+// STDIN: true
+// STDIN: 1/2/2024
+// INPUT into each type of variable (spec 7.2). An empty line is an empty STRING.
+DECLARE Age : INTEGER
+DECLARE Price : REAL
+DECLARE Initial : CHAR
+DECLARE Note : STRING
+DECLARE Ready : BOOLEAN
+DECLARE Due : DATE
+OUTPUT "Age?"
+INPUT Age
+INPUT Price
+INPUT Initial
+INPUT Note
+INPUT Ready
+INPUT Due
+OUTPUT Age + 1, " ", Price, " ", Initial, " [", Note, "] ", Ready, " ", Due

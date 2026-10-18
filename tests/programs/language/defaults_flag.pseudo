@@ -1,0 +1,12 @@
+// ARGS: --defaults
+// --defaults gives every variable a starting value (spec 5.1).
+TYPE Season = (Spring, Summer)
+DECLARE N : INTEGER
+DECLARE R : REAL
+DECLARE C : CHAR
+DECLARE S : STRING
+DECLARE B : BOOLEAN
+DECLARE D : DATE
+DECLARE E : Season
+DECLARE A : ARRAY[1:2] OF INTEGER
+OUTPUT N, " ", R, " [", C, "] [", S, "] ", B, " ", D, " ", E, " ", A[2]

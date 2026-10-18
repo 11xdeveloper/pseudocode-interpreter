@@ -1,0 +1,7 @@
+exit: 0
+--- stdout
+75.5155532954539
+63.90313938546974
+1000 rolls in [0, 6): TRUE
+A dice roll: 5
+--- stderr

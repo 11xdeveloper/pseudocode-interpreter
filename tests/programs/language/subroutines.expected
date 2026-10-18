@@ -1,0 +1,8 @@
+exit: 0
+--- stdout
+Hello
+Hello
+Max = 12
+Average = 7.5
+HI!
+--- stderr

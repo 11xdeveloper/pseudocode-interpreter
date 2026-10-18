@@ -1,0 +1,8 @@
+exit: 0
+--- stdout
+[first line]
+[second line]
+[]
+[last, no newline]
+An empty file starts at EOF: TRUE
+--- stderr

@@ -1,0 +1,7 @@
+exit: 0
+--- stdout
+big and odd
+WHILE ran 3 times
+REPEAT left Count at 0
+a REPEAT body runs at least once
+--- stderr

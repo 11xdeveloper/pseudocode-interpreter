@@ -1,0 +1,7 @@
+// R010: records between the ones written are empty.
+OPENFILE "Data.dat" FOR RANDOM
+Value ← 7
+SEEK "Data.dat", 5
+PUTRECORD "Data.dat", Value
+SEEK "Data.dat", 3
+GETRECORD "Data.dat", Value

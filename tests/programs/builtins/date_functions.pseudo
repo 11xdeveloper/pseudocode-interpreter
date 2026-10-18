@@ -1,0 +1,5 @@
+// Date functions (spec 9.3). DAYINDEX: Sunday = 1 ... Saturday = 7.
+OUTPUT DAY(02/01/2005), " ", MONTH(02/01/2005), " ", YEAR(02/01/2005)
+OUTPUT DAYINDEX(18/10/2026), DAYINDEX(19/10/2026), DAYINDEX(24/10/2026), " ", DAYINDEX(01/01/1970)
+OUTPUT SETDATE(29, 2, 2024), " ", SETDATE(1, 12, 2026) > 30/11/2026
+OUTPUT "NOW() is a DATE this year or later: ", YEAR(NOW()) >= 2026

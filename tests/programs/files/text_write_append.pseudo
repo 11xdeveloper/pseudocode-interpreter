@@ -1,0 +1,29 @@
+// WRITE empties a file, APPEND adds to it (spec 10.1).
+DECLARE Out : STRING
+Out ← "Out.txt"
+OPENFILE Out FOR WRITE
+WRITEFILE Out, "Scores"
+FOR I ← 1 TO 3
+   WRITEFILE Out, I * 1.5
+NEXT I
+WRITEFILE Out, 'x'
+WRITEFILE Out, 02/01/2005
+WRITEFILE Out, TRUE
+CLOSEFILE Out
+OPENFILE Out FOR APPEND
+WRITEFILE Out, "appended"
+CLOSEFILE Out
+CALL Show(Out)
+OPENFILE Out FOR WRITE
+WRITEFILE Out, "rewritten"
+CLOSEFILE Out
+CALL Show(Out)
+PROCEDURE Show(Name : STRING)
+   OUTPUT "--- ", Name
+   OPENFILE Name FOR READ
+   WHILE NOT EOF(Name)
+      READFILE Name, Line
+      OUTPUT Line
+   ENDWHILE
+   CLOSEFILE Name
+ENDPROCEDURE

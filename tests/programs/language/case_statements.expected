@@ -1,0 +1,15 @@
+exit: 0
+--- stdout
+one
+two or three
+two or three
+four or five,
+  over two lines
+four or five,
+  over two lines
+something else
+strafe B
+a STRING selector
+a January date
+done
+--- stderr

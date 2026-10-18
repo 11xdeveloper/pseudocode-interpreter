@@ -1,0 +1,6 @@
+// String and character functions (spec 9.1), with the spec's examples.
+OUTPUT RIGHT("ABCDEFGH", 3), " ", MID("ABCDEFGH", 2, 3), " ", LEFT("Hello", 2)
+OUTPUT LENGTH("Hello"), " ", LENGTH(""), " ", LENGTH('x')
+OUTPUT LCASE('A'), UCASE('b'), LCASE('7')
+OUTPUT TO_LOWER("MiXeD 123"), " ", TO_UPPER("MiXeD"), " ", TO_UPPER('q')
+OUTPUT ASC('A'), " ", CHR(66), " ", CHR(ASC('a') - 32)

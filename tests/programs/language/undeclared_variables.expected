@@ -1,0 +1,6 @@
+exit: 0
+--- stdout
+Counter = 2
+local Temp = 99
+Temp = global
+--- stderr

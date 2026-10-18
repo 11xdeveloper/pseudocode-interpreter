@@ -1,0 +1,7 @@
+exit: 0
+--- stdout
+Pupil2 with: colon;semi 5:S3:x
+12 3.0 0.1 Autumn 02/09/2024
+GETRECORD does not move the pointer: 12
+Into an undeclared variable: a STRING in record 10
+--- stderr

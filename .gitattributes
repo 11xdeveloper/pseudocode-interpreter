@@ -1,0 +1,2 @@
+# Input files for program tests must keep their exact bytes, such as \r\n line endings.
+tests/programs/**/*.files/** -text

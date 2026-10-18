@@ -1,0 +1,7 @@
+exit: 0
+--- stdout
+Counter = 5, MyPointer^ + 1 = 6
+Same target: TRUE
+List[2] = 99
+P.X = 7, now different: FALSE
+--- stderr

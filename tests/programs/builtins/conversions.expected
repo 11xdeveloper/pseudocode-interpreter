@@ -1,0 +1,7 @@
+exit: 0
+--- stdout
+42/5.0/-0.1
+43 -7.0 7
+TRUE TRUE TRUE TRUE
+FALSE FALSE FALSE FALSE FALSE FALSE
+--- stderr

@@ -1,0 +1,16 @@
+exit: 0
+--- stdout
+Sum 1 to 10 = 55, I afterwards = 11
+J = 10
+J = 7
+J = 4
+J = 1
+K keeps its start value: 5
+1,1
+1,2
+1,3
+2,1
+2,2
+2,3
+Bounds are evaluated once: N = 4
+--- stderr

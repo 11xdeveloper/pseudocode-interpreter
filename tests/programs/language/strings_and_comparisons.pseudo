@@ -1,0 +1,7 @@
+// & and comparisons (spec 4.4, 6.1).
+OUTPUT "Total: " & NUM_TO_STR(2 + 3) & '!'
+OUTPUT 'a' & 'b'
+OUTPUT "Apple" < "apple", " ", "ab" < "abc", " ", "b" >= 'a', " ", 'A' = "A"
+OUTPUT 5 = 5.0, " ", 2 < 2.5, " ", TRUE <> FALSE
+OUTPUT 02/01/2005 < 01/02/2005, " ", 01/01/2026 = 1/1/2026
+OUTPUT NOT 1 = 2, " ", NOT (1 = 1) OR TRUE

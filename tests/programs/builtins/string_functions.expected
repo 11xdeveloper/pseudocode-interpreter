@@ -1,0 +1,8 @@
+exit: 0
+--- stdout
+FGH BCD He
+5 0 1
+aB7
+mixed 123 MIXED Q
+65 B A
+--- stderr

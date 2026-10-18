@@ -1,0 +1,8 @@
+exit: 0
+--- stdout
+X<-1 means X < -1
+Total = 6
+En and minus signs: 6 6
+≠ ≥ ≤ work
+quotes from a PDF!
+--- stderr

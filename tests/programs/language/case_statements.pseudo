@@ -1,0 +1,27 @@
+// CASE (spec 7.4): first match wins, no fall-through.
+FOR Code ← 1 TO 6
+   CASE OF Code
+      1 : OUTPUT "one"
+      2, 3 : OUTPUT "two or three"
+      4 TO 5 :
+         OUTPUT "four or five,"
+         OUTPUT "  over two lines"
+      OTHERWISE OUTPUT "something else"
+   ENDCASE
+NEXT Code
+Move ← 'B'
+CASE OF Move
+   'W' : OUTPUT "up"
+   'A' TO 'D' : OUTPUT "strafe ", Move
+ENDCASE
+CASE OF "yes"
+   "no" : OUTPUT "no"
+   "yes" : OUTPUT "a STRING selector"
+ENDCASE
+CASE OF 42
+   1 : OUTPUT "no match and no OTHERWISE: nothing happens"
+ENDCASE
+CASE OF 02/01/2005
+   01/01/2005 TO 31/01/2005 : OUTPUT "a January date"
+ENDCASE
+OUTPUT "done"

@@ -1,0 +1,8 @@
+exit: 0
+--- stdout
+Swap: A = 2, B = 1
+After BYVAL: Ann
+After BYREF: []
+Undeclared BYREF argument: 42
+Half of 7: 3.5
+--- stderr

@@ -1,0 +1,53 @@
+// Initialisers, overriding, dispatch, SUPER and references (spec 11).
+CLASS Pet
+   PRIVATE Name : STRING
+   PUBLIC Legs : INTEGER
+   Legs ← 4
+   PUBLIC PROCEDURE NEW(GivenName : STRING)
+      Name ← GivenName
+   ENDPROCEDURE
+   PUBLIC FUNCTION GetName() RETURNS STRING
+      RETURN Name
+   ENDFUNCTION
+   PUBLIC FUNCTION Describe() RETURNS STRING
+      RETURN GetName() & " says " & Speak()
+   ENDFUNCTION
+   PUBLIC FUNCTION Speak() RETURNS STRING
+      RETURN "..."
+   ENDFUNCTION
+ENDCLASS
+
+CLASS Cat INHERITS Pet
+   PRIVATE Breed : STRING
+   DECLARE Lives : INTEGER
+   Lives ← 9
+   PUBLIC PROCEDURE NEW(GivenName : STRING, GivenBreed : STRING)
+      SUPER.NEW(GivenName)
+      Breed ← GivenBreed
+   ENDPROCEDURE
+   PUBLIC FUNCTION Speak() RETURNS STRING
+      RETURN "Meow (" & Breed & ")"
+   ENDFUNCTION
+   PUBLIC PROCEDURE LoseLife()
+      Lives ← Lives - 1
+   ENDPROCEDURE
+ENDCLASS
+
+CLASS Robot
+ENDCLASS
+
+DECLARE MyCat : Cat
+MyCat ← NEW Cat("Kitty", "Shorthair")
+OUTPUT MyCat.GetName(), " has ", MyCat.Legs, " legs and ", MyCat.Lives, " lives"
+OUTPUT MyCat.Describe()
+MyCat.LoseLife()
+CALL MyCat.LoseLife()
+OUTPUT "Lives now ", MyCat.Lives
+DECLARE APet : Pet
+APet ← MyCat
+APet.Legs ← 3
+OUTPUT "Objects are shared: ", MyCat.Legs
+APet ← NEW Pet("Rex")
+OUTPUT APet.Describe()
+R ← NEW Robot()
+OUTPUT "An implicit constructor"

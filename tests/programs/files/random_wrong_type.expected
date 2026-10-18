@@ -1,0 +1,6 @@
+exit: 2
+--- stdout
+--- stderr
+random_wrong_type.pseudo:8:1: Runtime error R002: Record 1 of "Data.dat" holds a value of type INTEGER, but Part is a REAL. GETRECORD needs a variable of exactly the stored type
+   GETRECORD "Data.dat", Part
+   ^

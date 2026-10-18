@@ -1,0 +1,8 @@
+// R002: GETRECORD needs a variable of exactly the stored type.
+DECLARE Whole : INTEGER
+DECLARE Part : REAL
+Whole ← 7
+OPENFILE "Data.dat" FOR RANDOM
+SEEK "Data.dat", 1
+PUTRECORD "Data.dat", Whole
+GETRECORD "Data.dat", Part

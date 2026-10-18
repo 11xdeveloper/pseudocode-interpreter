@@ -1,0 +1,9 @@
+exit: 0
+--- stdout
+Total: 5!
+ab
+TRUE TRUE TRUE TRUE
+TRUE TRUE TRUE
+TRUE TRUE
+TRUE TRUE
+--- stderr

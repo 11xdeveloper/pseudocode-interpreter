@@ -1,0 +1,26 @@
+// IF, WHILE and REPEAT (spec 7.3, 7.6, 7.7).
+X ← 7
+IF X > 5 THEN
+   IF X MOD 2 = 0 THEN
+      OUTPUT "big and even"
+   ELSE
+      OUTPUT "big and odd"
+   ENDIF
+ELSE
+   OUTPUT "small"
+ENDIF
+Count ← 0
+WHILE Count < 3 DO
+   Count ← Count + 1
+ENDWHILE
+OUTPUT "WHILE ran ", Count, " times"
+REPEAT
+   Count ← Count - 1
+UNTIL Count <= 0
+OUTPUT "REPEAT left Count at ", Count
+REPEAT
+   OUTPUT "a REPEAT body runs at least once"
+UNTIL TRUE
+WHILE FALSE
+   OUTPUT "never"
+ENDWHILE

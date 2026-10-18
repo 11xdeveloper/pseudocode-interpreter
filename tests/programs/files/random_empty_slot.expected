@@ -1,0 +1,6 @@
+exit: 2
+--- stdout
+--- stderr
+random_empty_slot.pseudo:7:1: Runtime error R010: Record 3 of "Data.dat" is empty. Write it with PUTRECORD first, or SEEK to another record
+   GETRECORD "Data.dat", Value
+   ^

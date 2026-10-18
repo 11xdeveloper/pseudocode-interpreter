@@ -1,0 +1,5 @@
+exit: 0
+--- stdout
+Johnson 71 Changed
+Ahmed scored 88
+--- stderr

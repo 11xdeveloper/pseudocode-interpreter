@@ -1,0 +1,10 @@
+// Enumerated types (spec 5.4).
+TYPE Season = (Spring, Summer, Autumn, Winter)
+DECLARE ThisSeason : Season
+ThisSeason ← Spring
+ThisSeason ← ThisSeason + 2
+OUTPUT ThisSeason, " ", ThisSeason > Summer, " ", Winter - 3
+CASE OF ThisSeason
+   Spring TO Summer : OUTPUT "warm"
+   Autumn : OUTPUT "falling leaves"
+ENDCASE

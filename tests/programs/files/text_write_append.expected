@@ -1,0 +1,14 @@
+exit: 0
+--- stdout
+--- Out.txt
+Scores
+1.5
+3.0
+4.5
+x
+02/01/2005
+TRUE
+appended
+--- Out.txt
+rewritten
+--- stderr

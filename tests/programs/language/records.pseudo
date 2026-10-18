@@ -1,0 +1,16 @@
+// Records (spec 5.6) copy on assignment.
+TYPE StudentRecord
+   DECLARE LastName : STRING
+   DECLARE Marks : ARRAY[1:3] OF INTEGER
+ENDTYPE
+DECLARE Pupil1 : StudentRecord
+DECLARE Pupil2 : StudentRecord
+Pupil1.LastName ← "Johnson"
+Pupil1.Marks[2] ← 71
+Pupil2 ← Pupil1
+Pupil1.LastName ← "Changed"
+OUTPUT Pupil2.LastName, " ", Pupil2.Marks[2], " ", Pupil1.LastName
+DECLARE Form : ARRAY[1:2] OF StudentRecord
+Form[2].LastName ← "Ahmed"
+Form[2].Marks[1] ← 88
+OUTPUT Form[2].LastName, " scored ", Form[2].Marks[1]

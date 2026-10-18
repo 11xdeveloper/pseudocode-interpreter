@@ -1,0 +1,6 @@
+exit: 2
+--- stdout
+--- stderr
+wrong_mode.pseudo:3:11: Runtime error R010: The file "W.txt" is open for WRITE, but EOF needs it open for READ
+   OUTPUT EOF("W.txt")
+             ^

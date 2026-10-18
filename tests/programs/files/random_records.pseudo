@@ -1,0 +1,39 @@
+// Random files (spec 10.2): SEEK, GETRECORD, PUTRECORD, records kept between opens.
+TYPE Season = (Spring, Summer, Autumn, Winter)
+TYPE StudentRecord
+   DECLARE LastName : STRING
+   DECLARE YearGroup : INTEGER
+   DECLARE Marks : ARRAY[1:3] OF REAL
+   DECLARE Favourite : Season
+   DECLARE Joined : DATE
+ENDTYPE
+DECLARE Pupil : StudentRecord
+OPENFILE "StudentFile.Dat" FOR RANDOM
+FOR N ← 1 TO 3
+   Pupil.LastName ← "Pupil" & NUM_TO_STR(N) & " with: colon;semi 5:S3:x"
+   Pupil.YearGroup ← 10 + N
+   Pupil.Marks[1] ← N * 1.5
+   Pupil.Marks[3] ← 0.1
+   Pupil.Favourite ← Spring + N
+   Pupil.Joined ← SETDATE(N, 9, 2024)
+   SEEK "StudentFile.Dat", N
+   PUTRECORD "StudentFile.Dat", Pupil
+NEXT N
+DECLARE Note : STRING
+Note ← "a STRING in record 10"
+SEEK "StudentFile.Dat", 10
+PUTRECORD "StudentFile.Dat", Note
+CLOSEFILE "StudentFile.dat"
+
+OPENFILE "StudentFile.Dat" FOR RANDOM
+SEEK "StudentFile.Dat", 2
+GETRECORD "StudentFile.Dat", Pupil
+OUTPUT Pupil.LastName
+OUTPUT Pupil.YearGroup, " ", Pupil.Marks[1], " ", Pupil.Marks[3], " ", Pupil.Favourite, " ", Pupil.Joined
+Pupil.YearGroup ← 0
+GETRECORD "StudentFile.Dat", Pupil
+OUTPUT "GETRECORD does not move the pointer: ", Pupil.YearGroup
+SEEK "StudentFile.Dat", 10
+GETRECORD "StudentFile.Dat", Loose
+OUTPUT "Into an undeclared variable: ", Loose
+CLOSEFILE "StudentFile.Dat"

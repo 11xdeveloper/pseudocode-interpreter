@@ -1,0 +1,5 @@
+exit: 0
+--- stdout
+Age?
+16 -2.5 q [] TRUE 01/02/2024
+--- stderr

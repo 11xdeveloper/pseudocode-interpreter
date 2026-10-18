@@ -1,0 +1,22 @@
+// Pointers (spec 5.5) to variables, elements and fields.
+TYPE TIntPointer = ^INTEGER
+TYPE Point
+   DECLARE X : INTEGER
+ENDTYPE
+DECLARE Counter : INTEGER
+DECLARE MyPointer : TIntPointer
+DECLARE Other : TIntPointer
+Counter ← 1
+MyPointer ← ^Counter
+MyPointer^ ← 5
+OUTPUT "Counter = ", Counter, ", MyPointer^ + 1 = ", MyPointer^ + 1
+Other ← MyPointer
+OUTPUT "Same target: ", Other = MyPointer
+DECLARE List : ARRAY[1:3] OF INTEGER
+MyPointer ← ^List[2]
+MyPointer^ ← 99
+OUTPUT "List[2] = ", List[2]
+DECLARE P : Point
+MyPointer ← ^P.X
+MyPointer^ ← 7
+OUTPUT "P.X = ", P.X, ", now different: ", Other = MyPointer

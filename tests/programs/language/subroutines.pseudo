@@ -1,0 +1,22 @@
+// Procedures and functions, hoisted above their definitions (spec 3, 8).
+CALL Greet
+CALL Greet()
+OUTPUT "Max = ", Max(10, 3 * 4)
+OUTPUT "Average = ", Average(7, 8)
+OUTPUT Shout("hi")
+PROCEDURE Greet
+   OUTPUT "Hello"
+ENDPROCEDURE
+FUNCTION Max(Number1 : INTEGER, Number2 : INTEGER) RETURNS INTEGER
+   IF Number1 > Number2 THEN
+      RETURN Number1
+   ELSE
+      RETURN Number2
+   ENDIF
+ENDFUNCTION
+FUNCTION Average(A : INTEGER, B : INTEGER) RETURNS REAL
+   RETURN (A + B) / 2
+ENDFUNCTION
+FUNCTION Shout(Text : STRING) RETURNS STRING
+   RETURN TO_UPPER(Text) & "!"
+ENDFUNCTION

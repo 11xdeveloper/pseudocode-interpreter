@@ -1,0 +1,7 @@
+// CONSTANT values are literals, optionally negative (spec 5.2).
+CONSTANT Rate = 6.50
+CONSTANT Low = -3
+CONSTANT Label = "N/A"
+CONSTANT Mark = 'X'
+CONSTANT Ready = TRUE
+OUTPUT Rate * 2, " ", Low, " ", Label, " ", Mark, " ", Ready

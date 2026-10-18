@@ -1,0 +1,10 @@
+// Spec 10.1's example. FileA.txt has \r\n endings, a blank line and no final newline.
+OPENFILE "FileA.txt" FOR READ
+WHILE NOT EOF("FileA.txt")
+   READFILE "FileA.txt", LineOfText
+   OUTPUT "[", LineOfText, "]"
+ENDWHILE
+CLOSEFILE "FileA.txt"
+OPENFILE "Empty.txt" FOR READ
+OUTPUT "An empty file starts at EOF: ", EOF("Empty.txt")
+CLOSEFILE "empty.TXT"

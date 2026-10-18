@@ -1,0 +1,9 @@
+exit: 0
+--- stdout
+Kitty has 4 legs and 9 lives
+Kitty says Meow (Shorthair)
+Lives now 7
+Objects are shared: 3
+Rex says ...
+An implicit constructor
+--- stderr

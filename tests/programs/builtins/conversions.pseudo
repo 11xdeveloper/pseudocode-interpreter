@@ -1,0 +1,5 @@
+// Number and text conversions (spec 9.1).
+OUTPUT NUM_TO_STR(42) & "/" & NUM_TO_STR(5.0) & "/" & NUM_TO_STR(-0.1)
+OUTPUT STR_TO_NUM("42") + 1, " ", STR_TO_NUM("-3.5") * 2, " ", STR_TO_NUM('7')
+OUTPUT IS_NUM("12"), " ", IS_NUM("-4.5"), " ", IS_NUM("+3"), " ", IS_NUM('9')
+OUTPUT IS_NUM(""), " ", IS_NUM(" 1"), " ", IS_NUM("1."), " ", IS_NUM(".5"), " ", IS_NUM("1e5"), " ", IS_NUM("abc")

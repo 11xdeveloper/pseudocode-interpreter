@@ -1,0 +1,7 @@
+exit: 2
+--- stdout
+one two
+--- stderr
+read_past_end.pseudo:10:1: Runtime error R010: There are no more lines to read in "Two.txt". Check EOF("Two.txt") before reading
+   READFILE "Two.txt", C
+   ^

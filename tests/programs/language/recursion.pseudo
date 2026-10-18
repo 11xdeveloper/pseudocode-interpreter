@@ -1,0 +1,22 @@
+// Each call gets its own local scope (spec 8.4).
+OUTPUT "5! = ", Factorial(5)
+OUTPUT "Fib(20) = ", Fib(20)
+OUTPUT "Sum to 5000 = ", SumTo(5000)
+FUNCTION Factorial(N : INTEGER) RETURNS INTEGER
+   IF N <= 1 THEN
+      RETURN 1
+   ENDIF
+   RETURN N * Factorial(N - 1)
+ENDFUNCTION
+FUNCTION Fib(N : INTEGER) RETURNS INTEGER
+   IF N < 2 THEN
+      RETURN N
+   ENDIF
+   RETURN Fib(N - 1) + Fib(N - 2)
+ENDFUNCTION
+FUNCTION SumTo(N : INTEGER) RETURNS INTEGER
+   IF N = 0 THEN
+      RETURN 0
+   ENDIF
+   RETURN N + SumTo(N - 1)
+ENDFUNCTION

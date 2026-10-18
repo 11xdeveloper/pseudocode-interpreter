@@ -1,0 +1,3 @@
+// R010: a statement needs the file open in the right mode.
+OPENFILE "W.txt" FOR WRITE
+OUTPUT EOF("W.txt")

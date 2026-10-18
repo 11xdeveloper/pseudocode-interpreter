@@ -1,0 +1,4 @@
+exit: 0
+--- stdout
+13.0 -3 N/A X TRUE
+--- stderr

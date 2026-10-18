@@ -1,0 +1,22 @@
+// Spec section 11's example.
+CLASS Pet
+   PRIVATE Name : STRING
+   PUBLIC PROCEDURE NEW(GivenName : STRING)
+      Name ← GivenName
+   ENDPROCEDURE
+   PUBLIC FUNCTION GetName() RETURNS STRING
+      RETURN Name
+   ENDFUNCTION
+ENDCLASS
+
+CLASS Cat INHERITS Pet
+   PRIVATE Breed : STRING
+   PUBLIC PROCEDURE NEW(GivenName : STRING, GivenBreed : STRING)
+      SUPER.NEW(GivenName)
+      Breed ← GivenBreed
+   ENDPROCEDURE
+ENDCLASS
+
+DECLARE MyCat : Cat
+MyCat ← NEW Cat("Kitty", "Shorthaired")
+OUTPUT MyCat.GetName()

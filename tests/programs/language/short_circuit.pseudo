@@ -1,0 +1,13 @@
+// AND and OR short-circuit (spec 6.3), so a guarded index is safe.
+DECLARE List : ARRAY[1:3] OF INTEGER
+List[1] ← 4
+List[2] ← 8
+List[3] ← 15
+Index ← 1
+WHILE Index <= 3 AND List[Index] <> 99
+   Index ← Index + 1
+ENDWHILE
+OUTPUT "Index = ", Index
+IF Index > 3 OR List[Index] = 0 THEN
+   OUTPUT "OR stopped before reading List[4]"
+ENDIF

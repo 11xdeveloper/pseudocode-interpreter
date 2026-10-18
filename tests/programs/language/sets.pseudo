@@ -1,0 +1,11 @@
+// Sets (spec 5.7) and IN.
+TYPE LetterSet = SET OF CHAR
+DEFINE Vowels ('A', 'E', 'I', 'O', 'U', 'A') : LetterSet
+Word ← "PSEUDOCODE"
+Count ← 0
+FOR I ← 1 TO LENGTH(Word)
+   IF MID(Word, I, 1) IN Vowels THEN
+      Count ← Count + 1
+   ENDIF
+NEXT I
+OUTPUT Count, " vowels in ", Word, ", 'Z' IN Vowels = ", 'Z' IN Vowels

@@ -1,0 +1,6 @@
+exit: 0
+--- stdout
+5! = 120
+Fib(20) = 6765
+Sum to 5000 = 12502500
+--- stderr

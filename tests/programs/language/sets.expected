@@ -1,0 +1,4 @@
+exit: 0
+--- stdout
+5 vowels in PSEUDOCODE, 'Z' IN Vowels = FALSE
+--- stderr
