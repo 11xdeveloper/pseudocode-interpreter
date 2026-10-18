@@ -9,6 +9,7 @@
 #include "AstPrinter.h"
 #include "Lexer.h"
 #include "Parser.h"
+#include "Types.h"
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -48,25 +49,30 @@ void printTokens(const std::vector<Token>& tokens) {
 
 }
 
-// Usage: PseudocodeInterpreter [--tokens | --ast] [file]
-// For now this lexes and parses the file (test.txt by default) and prints the
-// AST, or with --tokens the token stream.
+// Usage: PseudocodeInterpreter [--tokens | --ast | --types] [file]
+// For now this lexes and parses the file (test.txt by default), checks its
+// type definitions, and prints the AST, the token stream (--tokens) or the
+// resolved types (--types).
 int main(int argc, char* argv[]) {
 #ifdef _WIN32
 	SetConsoleOutputCP(CP_UTF8);
 #endif
-	bool showTokens = false;
+	enum class Show { Tokens, Ast, Types };
+	Show show = Show::Ast;
 	std::string fileName = "test.txt";
 	for (int i = 1; i < argc; ++i) {
 		std::string_view arg = argv[i];
 		if (arg == "--tokens") {
-			showTokens = true;
+			show = Show::Tokens;
 		}
 		else if (arg == "--ast") {
-			showTokens = false;
+			show = Show::Ast;
+		}
+		else if (arg == "--types") {
+			show = Show::Types;
 		}
 		else if (arg.starts_with("--")) {
-			std::cerr << "Unknown option " << arg << "\nUsage: PseudocodeInterpreter [--tokens | --ast] [file]\n";
+			std::cerr << "Unknown option " << arg << "\nUsage: PseudocodeInterpreter [--tokens | --ast | --types] [file]\n";
 			return 1;
 		}
 		else {
@@ -85,14 +91,22 @@ int main(int argc, char* argv[]) {
 	std::vector<Token> tokens = lexer.tokenize();
 	std::vector<Diagnostic> diagnostics = lexer.diagnostics();
 
-	if (showTokens) {
+	if (show == Show::Tokens) {
 		printTokens(tokens);
 	}
 	else {
 		Parser parser(std::move(tokens));
 		Program program = parser.parse();
 		diagnostics.insert(diagnostics.end(), parser.diagnostics().begin(), parser.diagnostics().end());
-		std::cout << printAst(program);
+
+		// Semantic checks only make sense on a program that parsed cleanly.
+		TypeTable types;
+		if (!lexer.hasErrors() && !parser.hasErrors()) {
+			types.build(program);
+			diagnostics.insert(diagnostics.end(), types.diagnostics().begin(), types.diagnostics().end());
+		}
+
+		std::cout << (show == Show::Types ? types.dump() : printAst(program));
 	}
 
 	std::stable_sort(diagnostics.begin(), diagnostics.end(), [](const Diagnostic& a, const Diagnostic& b) {
