@@ -83,8 +83,9 @@ std::string show(const T& value) {
 #define CHECK_EQ(actual, expected)                                                  \
 	do {                                                                            \
 		++test::checks();                                                           \
-		const auto& actual_ = (actual);                                             \
-		const auto& expected_ = (expected);                                         \
+		/* Copies, not references: a reference could outlive a temporary. */       \
+		const auto actual_ = (actual);                                              \
+		const auto expected_ = (expected);                                          \
 		if (!(actual_ == expected_)) {                                              \
 			test::fail(__FILE__, __LINE__, std::string(#actual) + " is "            \
 				+ test::show(actual_) + ", expected " + test::show(expected_));    \
