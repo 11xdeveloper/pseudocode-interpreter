@@ -1,0 +1,21 @@
+exit: 1
+--- stdout
+--- stderr
+m001_unknown_names.pseudo:3:6: Semantic error M001: There is no procedure or function called Missing
+   CALL Missing(1)
+        ^
+m001_unknown_names.pseudo:4:8: Semantic error M001: There is no procedure or function called NoSuch
+   OUTPUT NoSuch(2)
+          ^
+m001_unknown_names.pseudo:5:9: Semantic error M001: There is no class called Ghost
+   P ← NEW Ghost()
+           ^
+m001_unknown_names.pseudo:7:9: Semantic warning W003: Z is declared but never used
+   DECLARE Z : Unknown
+           ^
+m001_unknown_names.pseudo:7:13: Semantic error M001: Unknown type Unknown. Define it with TYPE or CLASS, or use INTEGER, REAL, CHAR, STRING, BOOLEAN or DATE
+   DECLARE Z : Unknown
+               ^
+m001_unknown_names.pseudo:8:10: Semantic error M001: The record type Rec has no field called Nmae
+   OUTPUT Q.Nmae
+            ^

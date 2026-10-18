@@ -1,0 +1,4 @@
+// R002: an undeclared variable's type is fixed by its first value (spec 5.1).
+Answer ← 'Y'
+OUTPUT Answer
+Answer ← "Yes"

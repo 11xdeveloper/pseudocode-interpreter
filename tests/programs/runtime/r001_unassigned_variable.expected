@@ -1,0 +1,7 @@
+exit: 2
+--- stdout
+Start
+--- stderr
+r001_unassigned_variable.pseudo:4:8: Runtime error R001: Variable Total used before it was given a value
+   OUTPUT Total + 1
+          ^

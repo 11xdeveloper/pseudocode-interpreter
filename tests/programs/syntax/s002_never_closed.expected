@@ -1,0 +1,9 @@
+exit: 1
+--- stdout
+--- stderr
+s002_never_closed.pseudo:2:1: Syntax error S002: This IF is never closed. Add ENDIF at the end of it
+   IF TRUE THEN
+   ^
+s002_never_closed.pseudo:3:4: Syntax error S002: This FOR is never closed. Add NEXT at the end of it
+      FOR I ← 1 TO 3
+      ^

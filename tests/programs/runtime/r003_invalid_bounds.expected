@@ -1,0 +1,6 @@
+exit: 2
+--- stdout
+--- stderr
+r003_invalid_bounds.pseudo:3:1: Runtime error R003: The array bounds [1:0] are invalid: the upper bound must not be less than the lower bound
+   DECLARE Empty : ARRAY[1:Size] OF INTEGER
+   ^

@@ -1,0 +1,4 @@
+// S002: a block still open at the end of the file.
+IF TRUE THEN
+   FOR I ← 1 TO 3
+      OUTPUT I

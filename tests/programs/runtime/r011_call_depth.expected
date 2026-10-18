@@ -1,0 +1,23 @@
+exit: 2
+--- stdout
+--- stderr
+r011_call_depth.pseudo:5:18: Runtime error R011: Too many nested calls (possible infinite recursion) in Forever
+      RETURN Forever(N + 1)
+                    ^
+   in function Forever (line 5), called from line 5
+   in function Forever (line 5), called from line 5
+   in function Forever (line 5), called from line 5
+   in function Forever (line 5), called from line 5
+   in function Forever (line 5), called from line 5
+   in function Forever (line 5), called from line 5
+   in function Forever (line 5), called from line 5
+   in function Forever (line 5), called from line 5
+   ... 484 more calls ...
+   in function Forever (line 5), called from line 5
+   in function Forever (line 5), called from line 5
+   in function Forever (line 5), called from line 5
+   in function Forever (line 5), called from line 5
+   in function Forever (line 5), called from line 5
+   in function Forever (line 5), called from line 5
+   in function Forever (line 5), called from line 5
+   in function Forever (line 5), called from line 3

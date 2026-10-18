@@ -1,0 +1,11 @@
+// M001: unknown subroutines, classes, types and fields.
+OUTPUT "never runs"
+CALL Missing(1)
+OUTPUT NoSuch(2)
+P ← NEW Ghost()
+DECLARE Q : Rec
+DECLARE Z : Unknown
+OUTPUT Q.Nmae
+TYPE Rec
+   DECLARE Name : STRING
+ENDTYPE

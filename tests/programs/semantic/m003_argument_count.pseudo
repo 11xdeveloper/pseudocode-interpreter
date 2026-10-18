@@ -1,0 +1,9 @@
+// M003: the wrong number of arguments.
+OUTPUT "never runs"
+CALL Two(1)
+OUTPUT LEFT("abc")
+P ← NEW Pet(1)
+PROCEDURE Two(A : INTEGER, B : INTEGER)
+ENDPROCEDURE
+CLASS Pet
+ENDCLASS

@@ -1,0 +1,8 @@
+// R007: a function that reaches ENDFUNCTION without RETURN.
+OUTPUT Sign(1)
+OUTPUT Sign(-1)
+FUNCTION Sign(N : INTEGER) RETURNS INTEGER
+   IF N > 0 THEN
+      RETURN 1
+   ENDIF
+ENDFUNCTION

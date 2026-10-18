@@ -1,0 +1,6 @@
+exit: 2
+--- stdout
+--- stderr
+r005_real_overflow.pseudo:4:10: Runtime error R005: The result is too large for a REAL
+      X ← X * X
+            ^

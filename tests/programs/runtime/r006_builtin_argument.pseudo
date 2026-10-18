@@ -1,0 +1,4 @@
+// R006: a built-in given a value it cannot use.
+Word ← "Hello"
+OUTPUT MID(Word, 2, 3)
+OUTPUT MID(Word, 4, 3)

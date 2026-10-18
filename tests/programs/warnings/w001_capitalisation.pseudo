@@ -1,0 +1,9 @@
+// W001: one name written with different capitalisation. The program still runs.
+DECLARE Total : INTEGER
+total ← 1
+TOTAL ← TOTAL + 1
+OUTPUT Total, " ", length("ab")
+TYPE Season = (Spring, Summer)
+DECLARE S : season
+S ← spring
+OUTPUT S

@@ -1,0 +1,8 @@
+// A semantic check that can only fail at runtime keeps its M code (spec 12):
+// P is undeclared, so its class is not known until it runs.
+CLASS Pet
+   PRIVATE Name : STRING
+ENDCLASS
+P ← NEW Pet()
+OUTPUT "made a pet"
+OUTPUT P.Name

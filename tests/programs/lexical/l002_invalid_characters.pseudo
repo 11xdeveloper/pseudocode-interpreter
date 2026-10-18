@@ -1,0 +1,4 @@
+// L002: characters that are not part of the language, with hints.
+X ← 5;
+Y ← 7 % 2
+Z ← 3 £ 4

@@ -1,0 +1,6 @@
+exit: 1
+--- stdout
+--- stderr
+s004_otherwise_not_last.pseudo:6:4: Syntax error S004: OTHERWISE must be the last clause in a CASE. Move this clause above it
+      2 : OUTPUT "two"
+      ^

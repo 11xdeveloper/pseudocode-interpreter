@@ -1,0 +1,21 @@
+exit: 1
+--- stdout
+--- stderr
+m007_constants_and_loop_variables.pseudo:5:1: Semantic error M007: Pi is a constant, so its value cannot be changed
+   Pi ← 3
+   ^
+m007_constants_and_loop_variables.pseudo:6:1: Semantic error M007: Spring is a value of the enumerated type Season, so it cannot be changed
+   Spring ← Summer
+   ^
+m007_constants_and_loop_variables.pseudo:8:4: Semantic error M007: I is the variable of a FOR loop, so it cannot be changed inside that loop
+      I ← I + 1
+      ^
+m007_constants_and_loop_variables.pseudo:9:10: Semantic error M007: I is the variable of a FOR loop, so it cannot be changed inside that loop
+      INPUT I
+            ^
+m007_constants_and_loop_variables.pseudo:10:8: Semantic error M007: I is the variable of a FOR loop, so it cannot be changed inside that loop
+      FOR I ← 1 TO 2
+          ^
+m007_constants_and_loop_variables.pseudo:12:16: Semantic error M007: I is the variable of a FOR loop, so it cannot be changed inside that loop
+      CALL Change(I)
+                  ^

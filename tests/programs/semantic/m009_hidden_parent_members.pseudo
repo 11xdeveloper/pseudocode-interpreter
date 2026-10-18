@@ -1,0 +1,13 @@
+// M009: a parent's PRIVATE members are hidden from subclasses (D15).
+CLASS Pet
+   PRIVATE Name : STRING
+   PRIVATE PROCEDURE Secret()
+   ENDPROCEDURE
+ENDCLASS
+CLASS Cat INHERITS Pet
+   PUBLIC PROCEDURE Peek()
+      OUTPUT Name
+      Name ← "x"
+      CALL Secret()
+   ENDPROCEDURE
+ENDCLASS

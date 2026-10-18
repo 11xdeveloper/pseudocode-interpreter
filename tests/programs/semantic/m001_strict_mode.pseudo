@@ -1,0 +1,10 @@
+// ARGS: --strict
+// M001 in strict mode: every variable must be declared before use (spec 5.1).
+OUTPUT "never runs"
+X ← 1
+DECLARE X : INTEGER
+DECLARE A : INTEGER
+A ← 1
+B ← A + C
+FOR I ← 1 TO 2
+NEXT I

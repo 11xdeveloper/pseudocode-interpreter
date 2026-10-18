@@ -1,0 +1,6 @@
+// S005: definitions only at top level (spec 3).
+IF TRUE THEN
+   PROCEDURE Inner
+      OUTPUT 1
+   ENDPROCEDURE
+ENDIF

@@ -1,0 +1,15 @@
+// M002: names declared twice, or clashing with other definitions (spec 5.8).
+OUTPUT "never runs"
+DECLARE Total : INTEGER
+DECLARE Total : REAL
+Count ← 0
+DECLARE Count : INTEGER
+DECLARE Max : INTEGER
+DECLARE Length : STRING
+CONSTANT Spring = 1
+TYPE Season = (Spring, Summer)
+PROCEDURE Max()
+ENDPROCEDURE
+PROCEDURE P(X : INTEGER)
+   DECLARE X : STRING
+ENDPROCEDURE

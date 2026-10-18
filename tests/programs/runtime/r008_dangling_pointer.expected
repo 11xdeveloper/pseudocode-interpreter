@@ -1,0 +1,7 @@
+exit: 2
+--- stdout
+5
+--- stderr
+r008_dangling_pointer.pseudo:5:1: Runtime error R008: This pointer refers to a variable that no longer exists, such as a local variable of a subroutine that has finished
+   P^ ← 1
+   ^

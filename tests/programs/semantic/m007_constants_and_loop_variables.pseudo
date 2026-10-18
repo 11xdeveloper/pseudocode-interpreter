@@ -1,0 +1,15 @@
+// M007: constants, enumerated values and FOR variables cannot be changed.
+OUTPUT "never runs"
+CONSTANT Pi = 3.14
+TYPE Season = (Spring, Summer)
+Pi ← 3
+Spring ← Summer
+FOR I ← 1 TO 3
+   I ← I + 1
+   INPUT I
+   FOR I ← 1 TO 2
+   NEXT I
+   CALL Change(I)
+NEXT I
+PROCEDURE Change(BYREF N : INTEGER)
+ENDPROCEDURE

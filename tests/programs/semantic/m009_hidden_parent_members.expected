@@ -1,0 +1,12 @@
+exit: 1
+--- stdout
+--- stderr
+m009_hidden_parent_members.pseudo:9:14: Semantic error M009: Name is PRIVATE in Pet, so Cat's methods cannot use it. Use a public method of Pet instead
+         OUTPUT Name
+                ^
+m009_hidden_parent_members.pseudo:10:7: Semantic error M009: Name is PRIVATE in Pet, so Cat's methods cannot use it. Use a public method of Pet instead
+         Name ← "x"
+         ^
+m009_hidden_parent_members.pseudo:11:12: Semantic error M009: Secret is PRIVATE in Pet, so Cat's methods cannot use it. Use a public method of Pet instead
+         CALL Secret()
+              ^

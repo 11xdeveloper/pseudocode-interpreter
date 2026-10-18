@@ -1,0 +1,9 @@
+exit: 1
+--- stdout
+--- stderr
+l001_unterminated_literals.pseudo:2:8: Lexical error L001: This string is missing its closing quote ". A string must end on the line it starts
+   OUTPUT "Hello
+          ^
+l001_unterminated_literals.pseudo:3:5: Lexical error L001: This character literal is missing its closing quote '
+   C ← 'x
+       ^

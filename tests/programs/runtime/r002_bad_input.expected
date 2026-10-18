@@ -1,0 +1,7 @@
+exit: 2
+--- stdout
+Age?
+--- stderr
+r002_bad_input.pseudo:5:1: Runtime error R002: INPUT for Age: An INTEGER was expected, but 'abc' is not a whole number
+   INPUT Age
+   ^

@@ -1,0 +1,4 @@
+// R003: an array's upper bound must not be below its lower bound.
+Size ← 0
+DECLARE Empty : ARRAY[1:Size] OF INTEGER
+Empty[1] ← 5

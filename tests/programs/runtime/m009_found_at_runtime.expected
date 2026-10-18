@@ -1,0 +1,7 @@
+exit: 2
+--- stdout
+made a pet
+--- stderr
+m009_found_at_runtime.pseudo:8:9: Runtime error M009: Name is PRIVATE in Pet, so it can only be used inside Pet's own methods
+   OUTPUT P.Name
+           ^

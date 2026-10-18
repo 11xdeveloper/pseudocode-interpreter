@@ -1,0 +1,6 @@
+// R009: an enumerated value moved past its last value.
+TYPE Season = (Spring, Summer, Autumn, Winter)
+S ← Autumn
+S ← S + 1
+OUTPUT S
+S ← S + 1

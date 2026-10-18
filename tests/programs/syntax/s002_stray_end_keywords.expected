@@ -1,0 +1,9 @@
+exit: 1
+--- stdout
+--- stderr
+s002_stray_end_keywords.pseudo:3:1: Syntax error S002: ENDIF found, but there is no IF for it to close
+   ENDIF
+   ^
+s002_stray_end_keywords.pseudo:4:1: Syntax error S002: ELSE found, but there is no IF for it to belong to
+   ELSE
+   ^

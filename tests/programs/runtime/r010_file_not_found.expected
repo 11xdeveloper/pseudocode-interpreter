@@ -1,0 +1,6 @@
+exit: 2
+--- stdout
+--- stderr
+r010_file_not_found.pseudo:2:1: Runtime error R010: The file "Missing.txt" does not exist. Files are looked for in the same folder as the program
+   OPENFILE "Missing.txt" FOR READ
+   ^

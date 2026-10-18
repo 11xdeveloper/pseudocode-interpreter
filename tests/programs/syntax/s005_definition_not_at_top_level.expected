@@ -1,0 +1,6 @@
+exit: 1
+--- stdout
+--- stderr
+s005_definition_not_at_top_level.pseudo:3:4: Syntax error S005: PROCEDURE definitions must be at the top level of the program, not inside the IF on line 2
+      PROCEDURE Inner
+      ^

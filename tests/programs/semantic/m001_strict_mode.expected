@@ -1,0 +1,15 @@
+exit: 1
+--- stdout
+--- stderr
+m001_strict_mode.pseudo:4:1: Semantic error M001: X is used before its declaration on line 5
+   X ← 1
+   ^
+m001_strict_mode.pseudo:8:1: Semantic error M001: B has not been declared. In strict mode every variable must be declared with DECLARE
+   B ← A + C
+   ^
+m001_strict_mode.pseudo:8:9: Semantic error M001: C has not been declared
+   B ← A + C
+           ^
+m001_strict_mode.pseudo:9:5: Semantic error M001: I has not been declared. In strict mode every variable must be declared with DECLARE
+   FOR I ← 1 TO 2
+       ^

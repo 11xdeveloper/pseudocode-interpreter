@@ -1,0 +1,24 @@
+exit: 1
+--- stdout
+--- stderr
+m004_type_definitions.pseudo:2:22: Semantic error M004: A SET can only hold simple values such as CHAR, INTEGER or an enumerated type, not a Node record
+   TYPE BadSet = SET OF Node
+                        ^
+m004_type_definitions.pseudo:3:1: Semantic error M004: The record Node contains itself, so it would be infinitely large. Use a pointer type for the link instead
+   TYPE Node
+   ^
+m004_type_definitions.pseudo:8:13: Semantic error M001: Unknown type Missing. Define it with TYPE or CLASS, or use INTEGER, REAL, CHAR, STRING, BOOLEAN or DATE
+   TYPE Ptr = ^Missing
+               ^
+m004_type_definitions.pseudo:11:18: Semantic error M004: B cannot inherit from A, because A already inherits from B (directly or indirectly)
+   CLASS B INHERITS A
+                    ^
+m004_type_definitions.pseudo:13:18: Semantic error M004: Season is not a class, so C cannot inherit from it
+   CLASS C INHERITS Season
+                    ^
+m004_type_definitions.pseudo:15:18: Semantic error M001: Unknown class Nowhere, so D cannot inherit from it
+   CLASS D INHERITS Nowhere
+                    ^
+m004_type_definitions.pseudo:17:21: Semantic error M004: A class cannot inherit from itself
+   CLASS Self INHERITS Self
+                       ^

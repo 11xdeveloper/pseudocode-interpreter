@@ -1,0 +1,14 @@
+// M005: functions and procedures used the wrong way (spec 6.3, 8).
+OUTPUT "never runs"
+CALL Max(1, 2)
+OUTPUT Greet()
+Greet()
+X ← Max
+CALL LENGTH("a")
+DECLARE List : ARRAY[1:3] OF INTEGER
+OUTPUT List(1)
+PROCEDURE Greet()
+ENDPROCEDURE
+FUNCTION Max(A : INTEGER, B : INTEGER) RETURNS INTEGER
+   RETURN A
+ENDFUNCTION

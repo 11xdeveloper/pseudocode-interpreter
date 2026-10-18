@@ -1,0 +1,9 @@
+exit: 1
+--- stdout
+--- stderr
+s001_unclosed_bracket.pseudo:2:14: Syntax error S001: Expected ')' to close the bracket, but the line ended
+   OUTPUT (1 + 2
+                ^
+s001_unclosed_bracket.pseudo:4:11: Syntax error S001: Expected ')' to close the bracket, but found THEN
+   IF (X > 3 THEN
+             ^

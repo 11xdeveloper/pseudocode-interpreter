@@ -1,0 +1,4 @@
+// R013: a FOR loop with a STEP of zero.
+Increment ← 0
+FOR I ← 1 TO 10 STEP Increment
+NEXT I

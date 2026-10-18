@@ -1,0 +1,15 @@
+// W002: CASE labels that overlap an earlier one (spec 7.4).
+TYPE Season = (Spring, Summer, Autumn, Winter)
+DECLARE S : Season
+S ← Winter
+CASE OF S
+   Spring TO Autumn : OUTPUT "warm"
+   Summer : OUTPUT "never chosen"
+   Winter, Autumn : OUTPUT "cold"
+ENDCASE
+CONSTANT Limit = 5
+CASE OF 7
+   1 TO 10 : OUTPUT "small"
+   Limit : OUTPUT "never chosen"
+   8 TO 20 : OUTPUT "partly covered"
+ENDCASE

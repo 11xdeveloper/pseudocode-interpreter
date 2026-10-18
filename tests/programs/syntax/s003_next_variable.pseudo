@@ -1,0 +1,4 @@
+// S003: NEXT names a different variable from its FOR.
+FOR I ← 1 TO 3
+   OUTPUT I
+NEXT J

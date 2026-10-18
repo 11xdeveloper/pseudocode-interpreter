@@ -1,0 +1,10 @@
+exit: 0
+--- stdout
+done
+--- stderr
+w004_file_left_open.pseudo:2:1: Runtime warning W004: The file "Log.txt" was still open when the program ended, so it was closed automatically. Close it with CLOSEFILE
+   OPENFILE "Log.txt" FOR WRITE
+   ^
+w004_file_left_open.pseudo:4:1: Runtime warning W004: The file "Other.txt" was still open when the program ended, so it was closed automatically. Close it with CLOSEFILE
+   OPENFILE "Other.txt" FOR APPEND
+   ^

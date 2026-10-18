@@ -1,0 +1,8 @@
+exit: 2
+--- stdout
+1
+--- stderr
+r007_function_without_return.pseudo:4:1: Runtime error R007: Function Sign ended without returning a value
+   FUNCTION Sign(N : INTEGER) RETURNS INTEGER
+   ^
+   in function Sign (line 5), called from line 3

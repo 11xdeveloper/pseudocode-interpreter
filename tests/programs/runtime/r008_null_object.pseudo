@@ -1,0 +1,6 @@
+// R008: an object variable that has not been given an object.
+CLASS Pet
+   PUBLIC Name : STRING
+ENDCLASS
+DECLARE P : Pet
+OUTPUT P.Name

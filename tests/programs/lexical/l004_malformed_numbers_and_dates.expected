@@ -1,0 +1,12 @@
+exit: 1
+--- stdout
+--- stderr
+l004_malformed_numbers_and_dates.pseudo:2:5: Lexical error L004: '5.' is not a valid number: a REAL needs a digit after the decimal point. Write 5.0
+   A ← 5.
+       ^
+l004_malformed_numbers_and_dates.pseudo:3:5: Lexical error L004: '.5' is not a valid number: a REAL needs a digit before the decimal point. Write 0.5
+   B ← .5
+       ^
+l004_malformed_numbers_and_dates.pseudo:4:5: Lexical error L004: '31/02/2024' is not a valid date. To divide, put spaces around '/'
+   D ← 31/02/2024
+       ^

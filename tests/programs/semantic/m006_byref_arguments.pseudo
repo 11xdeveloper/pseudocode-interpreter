@@ -1,0 +1,11 @@
+// M006: BYREF needs a variable; functions cannot have BYREF parameters.
+OUTPUT "never runs"
+CONSTANT Limit = 3
+CALL Inc(Limit)
+CALL Inc(4 + 1)
+PROCEDURE Inc(BYREF N : INTEGER)
+   N ← N + 1
+ENDPROCEDURE
+FUNCTION Bad(BYREF N : INTEGER) RETURNS INTEGER
+   RETURN N
+ENDFUNCTION

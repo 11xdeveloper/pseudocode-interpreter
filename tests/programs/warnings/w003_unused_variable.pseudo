@@ -1,0 +1,9 @@
+// W003: a variable declared but never used, globally or in a subroutine.
+DECLARE Used : INTEGER
+DECLARE Unused : STRING
+Used ← 1
+OUTPUT Used
+CALL P
+PROCEDURE P()
+   DECLARE Local : INTEGER
+ENDPROCEDURE

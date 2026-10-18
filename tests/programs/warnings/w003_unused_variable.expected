@@ -1,0 +1,10 @@
+exit: 0
+--- stdout
+1
+--- stderr
+w003_unused_variable.pseudo:3:9: Semantic warning W003: Unused is declared but never used
+   DECLARE Unused : STRING
+           ^
+w003_unused_variable.pseudo:8:12: Semantic warning W003: Local is declared but never used
+      DECLARE Local : INTEGER
+              ^

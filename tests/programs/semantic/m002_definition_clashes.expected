@@ -1,0 +1,24 @@
+exit: 1
+--- stdout
+--- stderr
+m002_definition_clashes.pseudo:3:1: Semantic error M002: LENGTH is the name of a built-in function, so it cannot be used for a type
+   TYPE LENGTH = (A1, B1)
+   ^
+m002_definition_clashes.pseudo:4:11: Semantic error M002: Spring is already a value of the enumerated type Season
+   PROCEDURE Spring()
+             ^
+m002_definition_clashes.pseudo:6:29: Semantic error M002: There is already a parameter called X in Swap
+   PROCEDURE Swap(X : INTEGER, x : INTEGER)
+                               ^
+m002_definition_clashes.pseudo:8:11: Semantic error M002: There is already a procedure called Swap on line 6
+   PROCEDURE Swap()
+             ^
+m002_definition_clashes.pseudo:10:11: Semantic error M002: MID is a built-in function, so it cannot be redefined
+   PROCEDURE MID()
+             ^
+m002_definition_clashes.pseudo:14:21: Semantic error M002: Pet already has an attribute called Name
+      PUBLIC PROCEDURE Name()
+                       ^
+m002_definition_clashes.pseudo:18:12: Semantic error M002: Cat already has an attribute called Name (inherited from Pet)
+      PRIVATE Name : STRING
+              ^

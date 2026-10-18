@@ -1,0 +1,9 @@
+exit: 1
+--- stdout
+--- stderr
+m009_private_members.pseudo:10:10: Semantic error M009: Name is PRIVATE in Pet, so it can only be used inside Pet's own methods
+   OUTPUT P.Name
+            ^
+m009_private_members.pseudo:11:8: Semantic error M009: Secret is PRIVATE in Pet, so it can only be called from Pet's own methods
+   CALL P.Secret()
+          ^

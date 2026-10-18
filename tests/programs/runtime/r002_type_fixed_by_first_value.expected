@@ -1,0 +1,7 @@
+exit: 2
+--- stdout
+Y
+--- stderr
+r002_type_fixed_by_first_value.pseudo:4:1: Runtime error R002: Cannot assign to Answer. Cannot use a STRING where a CHAR is expected. A STRING cannot become a CHAR, even if it is one character long
+   Answer ← "Yes"
+   ^

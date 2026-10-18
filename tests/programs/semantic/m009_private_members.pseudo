@@ -1,0 +1,11 @@
+// M009: PRIVATE members used from outside their class (spec 11.2).
+OUTPUT "never runs"
+CLASS Pet
+   PRIVATE Name : STRING
+   PRIVATE PROCEDURE Secret()
+   ENDPROCEDURE
+ENDCLASS
+DECLARE P : Pet
+P ← NEW Pet()
+OUTPUT P.Name
+CALL P.Secret()

@@ -1,0 +1,6 @@
+// ARGS: --max-steps 100
+// R012: --max-steps stops a loop that never ends (spec 7.8).
+X ← 0
+WHILE TRUE
+   X ← X + 1
+ENDWHILE

@@ -1,0 +1,12 @@
+exit: 1
+--- stdout
+--- stderr
+l003_keyword_case.pseudo:3:1: Lexical error L003: Keywords must be upper case — did you mean IF?
+   if X = 1 then
+   ^
+l003_keyword_case.pseudo:3:10: Lexical error L003: Keywords must be upper case — did you mean THEN?
+   if X = 1 then
+            ^
+l003_keyword_case.pseudo:5:1: Lexical error L003: Keywords must be upper case — did you mean ENDIF?
+   endif
+   ^

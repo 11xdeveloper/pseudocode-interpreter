@@ -1,0 +1,10 @@
+// S001: the message names what was expected. One error is reported per line.
+OUTPUT "never runs"
+OUTPUT
+X = 5
+IF 1 < 2 < 3 THEN
+ENDIF
+DECLARE A, B : INTEGER
+CONSTANT Rate ← 5
+FOR I = 1 TO 3
+NEXT I

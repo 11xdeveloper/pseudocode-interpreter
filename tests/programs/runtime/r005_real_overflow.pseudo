@@ -1,0 +1,5 @@
+// R005: a REAL result too large to represent.
+X ← 10000000000.0
+FOR I ← 1 TO 40
+   X ← X * X
+NEXT I

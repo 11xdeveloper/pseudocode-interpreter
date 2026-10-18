@@ -1,0 +1,5 @@
+// STDIN: 15
+// R014: INPUT when there is nothing left to read.
+INPUT First
+OUTPUT First
+INPUT Second

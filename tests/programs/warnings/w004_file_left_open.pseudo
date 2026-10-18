@@ -1,0 +1,5 @@
+// W004: files still open when the program ends normally are closed and saved.
+OPENFILE "Log.txt" FOR WRITE
+WRITEFILE "Log.txt", "saved anyway"
+OPENFILE "Other.txt" FOR APPEND
+OUTPUT "done"

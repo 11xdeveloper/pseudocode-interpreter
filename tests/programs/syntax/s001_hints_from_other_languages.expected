@@ -1,0 +1,15 @@
+exit: 1
+--- stdout
+--- stderr
+s001_hints_from_other_languages.pseudo:2:1: Syntax error S001: Use OUTPUT to display values, as in OUTPUT "Hello"
+   PRINT "hi"
+   ^
+s001_hints_from_other_languages.pseudo:3:1: Syntax error S001: A FOR loop ends with NEXT, as in NEXT Index
+   ENDFOR
+   ^
+s001_hints_from_other_languages.pseudo:4:1: Syntax error S001: There is no ELSEIF. Write ELSE, then the IF on the next line with its own ENDIF
+   ELSEIF
+   ^
+s001_hints_from_other_languages.pseudo:5:1: Syntax error S001: 'Total' on its own is not a statement. To call a procedure, write CALL Total
+   Total
+   ^

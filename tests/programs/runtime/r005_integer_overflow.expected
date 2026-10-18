@@ -1,0 +1,7 @@
+exit: 2
+--- stdout
+9223372036854775807
+--- stderr
+r005_integer_overflow.pseudo:4:12: Runtime error R005: The result is too large for an INTEGER, which must stay between -9223372036854775808 and 9223372036854775807
+   OUTPUT Big + 1
+              ^

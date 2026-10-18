@@ -1,0 +1,6 @@
+exit: 2
+--- stdout
+--- stderr
+r013_step_zero.pseudo:3:22: Runtime error R013: The STEP of a FOR loop cannot be zero, or the loop would never end
+   FOR I ← 1 TO 10 STEP Increment
+                        ^

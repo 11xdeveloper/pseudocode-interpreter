@@ -1,0 +1,7 @@
+exit: 2
+--- stdout
+5.0
+--- stderr
+r004_division_by_zero.pseudo:5:10: Runtime error R004: DIV by zero
+   OUTPUT X DIV Y
+            ^

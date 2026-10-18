@@ -1,0 +1,7 @@
+// S004: OTHERWISE must be the last clause of a CASE.
+X ← 1
+CASE OF X
+   1 : OUTPUT "one"
+   OTHERWISE : OUTPUT "other"
+   2 : OUTPUT "two"
+ENDCASE

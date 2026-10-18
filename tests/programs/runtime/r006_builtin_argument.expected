@@ -1,0 +1,7 @@
+exit: 2
+--- stdout
+ell
+--- stderr
+r006_builtin_argument.pseudo:4:11: Runtime error R006: MID would need characters 4 to 6, but the string has only 5
+   OUTPUT MID(Word, 4, 3)
+             ^

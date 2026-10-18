@@ -1,0 +1,6 @@
+exit: 2
+--- stdout
+--- stderr
+r008_null_object.pseudo:6:9: Runtime error R008: This object variable does not refer to an object yet. Create one with NEW
+   OUTPUT P.Name
+           ^

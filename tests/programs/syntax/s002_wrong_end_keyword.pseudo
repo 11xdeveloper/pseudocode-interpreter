@@ -1,0 +1,6 @@
+// S002: a block closed by the wrong keyword names both (spec 3.2).
+X ← 0
+WHILE X < 10
+   IF X = 5 THEN
+      OUTPUT X
+ENDWHILE

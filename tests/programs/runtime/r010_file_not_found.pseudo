@@ -1,0 +1,2 @@
+// R010: opening a file that does not exist.
+OPENFILE "Missing.txt" FOR READ

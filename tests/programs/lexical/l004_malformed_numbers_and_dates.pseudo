@@ -1,0 +1,4 @@
+// L004: a REAL needs digits on both sides of the point, and dates must be real dates.
+A ← 5.
+B ← .5
+D ← 31/02/2024

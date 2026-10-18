@@ -1,0 +1,4 @@
+// R001: a declared variable read before it has a value.
+DECLARE Total : INTEGER
+OUTPUT "Start"
+OUTPUT Total + 1

@@ -1,0 +1,18 @@
+// M004 for invalid type definitions; M001 for unknown ones.
+TYPE BadSet = SET OF Node
+TYPE Node
+   DECLARE Value : INTEGER
+   DECLARE Children : ARRAY[1:2] OF Node
+ENDTYPE
+TYPE Season = (Spring, Summer)
+TYPE Ptr = ^Missing
+CLASS A INHERITS B
+ENDCLASS
+CLASS B INHERITS A
+ENDCLASS
+CLASS C INHERITS Season
+ENDCLASS
+CLASS D INHERITS Nowhere
+ENDCLASS
+CLASS Self INHERITS Self
+ENDCLASS

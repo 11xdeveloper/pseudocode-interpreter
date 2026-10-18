@@ -1,0 +1,7 @@
+exit: 2
+--- stdout
+15
+--- stderr
+r014_end_of_input.pseudo:5:1: Runtime error R014: End of input reached while INPUT was waiting for a value for Second
+   INPUT Second
+   ^

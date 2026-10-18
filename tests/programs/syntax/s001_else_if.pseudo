@@ -1,0 +1,9 @@
+// There is no ELSE IF (spec 3.2). Only one error is reported for the chain.
+X ← 2
+IF X = 1 THEN
+   OUTPUT "one"
+ELSE IF X = 2 THEN
+   OUTPUT "two"
+ELSE
+   OUTPUT "other"
+ENDIF

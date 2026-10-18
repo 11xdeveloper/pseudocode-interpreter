@@ -1,0 +1,4 @@
+// S002: END keywords with nothing to close.
+OUTPUT 1
+ENDIF
+ELSE

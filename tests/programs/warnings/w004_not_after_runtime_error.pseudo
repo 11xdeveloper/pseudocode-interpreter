@@ -1,0 +1,4 @@
+// After a runtime error, open files are closed quietly (D28).
+OPENFILE "Log.txt" FOR WRITE
+WRITEFILE "Log.txt", "first line"
+OUTPUT 1 DIV 0

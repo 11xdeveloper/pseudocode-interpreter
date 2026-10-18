@@ -1,0 +1,20 @@
+exit: 0
+--- stdout
+2 2
+Spring
+--- stderr
+w001_capitalisation.pseudo:3:1: Semantic warning W001: total and Total (line 2) are the same name written with different capitalisation
+   total ← 1
+   ^
+w001_capitalisation.pseudo:4:9: Semantic warning W001: TOTAL and Total (line 2) are the same name written with different capitalisation
+   TOTAL ← TOTAL + 1
+           ^
+w001_capitalisation.pseudo:5:20: Semantic warning W001: length and LENGTH are the same name written with different capitalisation
+   OUTPUT Total, " ", length("ab")
+                      ^
+w001_capitalisation.pseudo:7:13: Semantic warning W001: season and Season (line 6) are the same name written with different capitalisation
+   DECLARE S : season
+               ^
+w001_capitalisation.pseudo:8:5: Semantic warning W001: spring and Spring (line 6) are the same name written with different capitalisation
+   S ← spring
+       ^

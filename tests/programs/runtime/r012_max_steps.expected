@@ -1,0 +1,6 @@
+exit: 2
+--- stdout
+--- stderr
+r012_max_steps.pseudo:5:4: Runtime error R012: The program was stopped after 100 statements (--max-steps). It may be stuck in a loop that never ends
+      X ← X + 1
+      ^

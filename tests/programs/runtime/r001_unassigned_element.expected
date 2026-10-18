@@ -1,0 +1,7 @@
+exit: 2
+--- stdout
+10
+--- stderr
+r001_unassigned_element.pseudo:5:13: Runtime error R001: Marks[2] used before it was given a value
+   OUTPUT Marks[2]
+               ^

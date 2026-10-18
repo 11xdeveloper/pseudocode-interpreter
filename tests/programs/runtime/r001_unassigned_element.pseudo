@@ -1,0 +1,5 @@
+// R001 for an array element names the element.
+DECLARE Marks : ARRAY[1:3] OF INTEGER
+Marks[1] ← 10
+OUTPUT Marks[1]
+OUTPUT Marks[2]

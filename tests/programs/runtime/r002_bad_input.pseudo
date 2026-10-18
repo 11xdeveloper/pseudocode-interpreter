@@ -1,0 +1,5 @@
+// STDIN: abc
+// R002: INPUT text that does not fit the variable's type.
+DECLARE Age : INTEGER
+OUTPUT "Age?"
+INPUT Age

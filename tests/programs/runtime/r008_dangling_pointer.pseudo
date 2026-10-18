@@ -1,0 +1,10 @@
+// R008: a pointer to a local variable of a subroutine that has finished (spec 5.5).
+TYPE IntPtr = ^INTEGER
+DECLARE P : IntPtr
+CALL MakeLocal
+P^ ← 1
+PROCEDURE MakeLocal
+   Local ← 5
+   P ← ^Local
+   OUTPUT P^
+ENDPROCEDURE

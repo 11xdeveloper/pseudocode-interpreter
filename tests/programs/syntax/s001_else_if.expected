@@ -1,0 +1,6 @@
+exit: 1
+--- stdout
+--- stderr
+s001_else_if.pseudo:5:6: Syntax error S001: There is no ELSE IF. Put the IF on a new line after ELSE, and close it with its own ENDIF
+   ELSE IF X = 2 THEN
+        ^

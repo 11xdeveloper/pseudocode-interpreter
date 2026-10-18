@@ -1,0 +1,17 @@
+exit: 0
+--- stdout
+cold
+small
+--- stderr
+w002_overlapping_case_labels.pseudo:7:4: Semantic warning W002: The label Summer overlaps Spring TO Autumn on line 6, which is tested first, so this label can never match
+      Summer : OUTPUT "never chosen"
+      ^
+w002_overlapping_case_labels.pseudo:8:12: Semantic warning W002: The label Autumn overlaps Spring TO Autumn on line 6, which is tested first, so this label can never match
+      Winter, Autumn : OUTPUT "cold"
+              ^
+w002_overlapping_case_labels.pseudo:13:4: Semantic warning W002: The label 5 overlaps 1 TO 10 on line 12, which is tested first, so this label can never match
+      Limit : OUTPUT "never chosen"
+      ^
+w002_overlapping_case_labels.pseudo:14:4: Semantic warning W002: The label 8 TO 20 overlaps 1 TO 10 on line 12, which is tested first, so the values they share go to the earlier label
+      8 TO 20 : OUTPUT "partly covered"
+      ^

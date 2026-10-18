@@ -1,0 +1,4 @@
+// R005: INTEGER overflow is an error, not wraparound (spec 4.1).
+Big ← 9223372036854775807
+OUTPUT Big
+OUTPUT Big + 1

@@ -1,0 +1,11 @@
+// M008: RETURN outside a function, SUPER where there is no parent.
+OUTPUT "never runs"
+RETURN 1
+PROCEDURE P()
+   RETURN 2
+ENDPROCEDURE
+CLASS A
+   PUBLIC PROCEDURE M()
+      SUPER.M()
+   ENDPROCEDURE
+ENDCLASS

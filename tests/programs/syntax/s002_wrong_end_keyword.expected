@@ -1,0 +1,6 @@
+exit: 1
+--- stdout
+--- stderr
+s002_wrong_end_keyword.pseudo:6:1: Syntax error S002: ENDWHILE found, but the IF on line 4 is still open. Add ENDIF before ENDWHILE
+   ENDWHILE
+   ^

@@ -1,0 +1,6 @@
+// ARGS: --max-depth 500
+// R011: runaway recursion. The call chain is cut down to its ends.
+OUTPUT Forever(1)
+FUNCTION Forever(N : INTEGER) RETURNS INTEGER
+   RETURN Forever(N + 1)
+ENDFUNCTION

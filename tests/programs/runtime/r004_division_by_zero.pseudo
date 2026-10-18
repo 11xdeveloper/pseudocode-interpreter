@@ -1,0 +1,5 @@
+// R004: division, DIV or MOD by zero.
+X ← 10
+Y ← 0
+OUTPUT X / 2
+OUTPUT X DIV Y

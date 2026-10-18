@@ -1,0 +1,17 @@
+// Spec 13.3: the guide's Cat example declares Breed as INTEGER and then
+// assigns it a STRING. That is reported before the program runs.
+CLASS Pet
+   PRIVATE Name : STRING
+   PUBLIC PROCEDURE NEW(GivenName : STRING)
+      Name ← GivenName
+   ENDPROCEDURE
+ENDCLASS
+CLASS Cat INHERITS Pet
+   PRIVATE Breed : INTEGER
+   PUBLIC PROCEDURE NEW(GivenName : STRING, GivenBreed : STRING)
+      SUPER.NEW(GivenName)
+      Breed ← GivenBreed
+   ENDPROCEDURE
+ENDCLASS
+DECLARE MyCat : Cat
+MyCat ← NEW Cat("Kitty", "Shorthaired")

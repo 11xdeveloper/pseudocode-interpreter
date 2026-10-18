@@ -1,0 +1,6 @@
+exit: 2
+--- stdout
+--- stderr
+w004_not_after_runtime_error.pseudo:4:10: Runtime error R004: DIV by zero
+   OUTPUT 1 DIV 0
+            ^

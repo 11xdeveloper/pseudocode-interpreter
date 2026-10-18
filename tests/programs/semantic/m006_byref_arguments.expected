@@ -1,0 +1,12 @@
+exit: 1
+--- stdout
+--- stderr
+m006_byref_arguments.pseudo:4:10: Semantic error M006: A constant cannot be passed to the BYREF parameter N of Inc
+   CALL Inc(Limit)
+            ^
+m006_byref_arguments.pseudo:5:12: Semantic error M006: The BYREF parameter N of Inc needs a variable, array element or field to change, not an expression or literal
+   CALL Inc(4 + 1)
+              ^
+m006_byref_arguments.pseudo:9:20: Semantic error M006: A FUNCTION cannot have BYREF parameters. Make Bad a PROCEDURE, or pass N BYVAL and RETURN the result
+   FUNCTION Bad(BYREF N : INTEGER) RETURNS INTEGER
+                      ^

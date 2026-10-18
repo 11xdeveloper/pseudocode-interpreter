@@ -1,0 +1,24 @@
+exit: 1
+--- stdout
+--- stderr
+m002_duplicate_names.pseudo:3:9: Semantic warning W003: Total is declared but never used
+   DECLARE Total : INTEGER
+           ^
+m002_duplicate_names.pseudo:4:9: Semantic error M002: Total is already declared on line 3
+   DECLARE Total : REAL
+           ^
+m002_duplicate_names.pseudo:6:9: Semantic error M002: Count is already in use (from line 5), so it cannot be declared here. Put the DECLARE before its first use
+   DECLARE Count : INTEGER
+           ^
+m002_duplicate_names.pseudo:7:9: Semantic error M002: Max is already the name of a procedure on line 11
+   DECLARE Max : INTEGER
+           ^
+m002_duplicate_names.pseudo:8:9: Semantic error M002: Length is a built-in function, so it cannot be used as a name
+   DECLARE Length : STRING
+           ^
+m002_duplicate_names.pseudo:9:10: Semantic error M002: Spring is already a value of the enumerated type Season
+   CONSTANT Spring = 1
+            ^
+m002_duplicate_names.pseudo:14:12: Semantic error M002: X is already a parameter of P
+      DECLARE X : STRING
+              ^

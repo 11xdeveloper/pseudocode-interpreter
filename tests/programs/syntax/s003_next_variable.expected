@@ -1,0 +1,6 @@
+exit: 1
+--- stdout
+--- stderr
+s003_next_variable.pseudo:4:6: Syntax error S003: NEXT J does not match the loop variable I of the FOR on line 2
+   NEXT J
+        ^

@@ -1,0 +1,6 @@
+// A missing ')' is reported at the end of its line; the next lines still parse.
+OUTPUT (1 + 2
+X ← 5
+IF (X > 3 THEN
+   OUTPUT X
+ENDIF

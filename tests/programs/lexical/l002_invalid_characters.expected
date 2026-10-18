@@ -1,0 +1,15 @@
+exit: 1
+--- stdout
+--- stderr
+l002_invalid_characters.pseudo:2:6: Lexical error L002: Semicolons are not used: a statement ends at the end of its line
+   X ← 5;
+        ^
+l002_invalid_characters.pseudo:3:7: Lexical error L002: '%' is not an operator. Use MOD for the remainder
+   Y ← 7 % 2
+         ^
+l002_invalid_characters.pseudo:4:7: Lexical error L002: Invalid character '£' (U+00A3) in source
+   Z ← 3 £ 4
+         ^
+l002_invalid_characters.pseudo:4:9: Syntax error S001: Expected the end of the line, but found 4
+   Z ← 3 £ 4
+           ^
