@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <charconv>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -8,6 +10,7 @@
 
 #include "AstPrinter.h"
 #include "Environment.h"
+#include "Evaluator.h"
 #include "Lexer.h"
 #include "Parser.h"
 #include "Types.h"
@@ -48,32 +51,75 @@ void printTokens(const std::vector<Token>& tokens) {
 	}
 }
 
+constexpr const char* Usage =
+	"Usage: PseudocodeInterpreter [options] [file]\n"
+	"Runs a 9618 pseudocode program (test.txt if no file is given).\n"
+	"\n"
+	"  --strict        every variable must be declared\n"
+	"  --defaults      variables start as 0, 0.0, \"\", FALSE and so on\n"
+	"  --max-steps N   stop after N statements (catches endless loops)\n"
+	"  --max-depth N   allow calls to nest N deep (default 10000)\n"
+	"  --tokens        print the tokens instead of running\n"
+	"  --ast           print the syntax tree instead of running\n"
+	"  --types         print the defined types instead of running\n";
+
+bool parseCount(std::string_view text, std::uint64_t& out) {
+	auto result = std::from_chars(text.data(), text.data() + text.size(), out);
+	return result.ec == std::errc() && result.ptr == text.data() + text.size() && out > 0;
 }
 
-// Usage: PseudocodeInterpreter [--tokens | --ast | --types] [file]
-// For now this lexes and parses the file (test.txt by default), checks its
-// type and subroutine definitions, and prints the AST, the token stream (--tokens) or the
-// resolved types (--types).
+// Prints diagnostics in source order. Returns true if any is an error.
+bool report(std::vector<Diagnostic> diagnostics, std::string_view fileName, std::string_view source) {
+	std::stable_sort(diagnostics.begin(), diagnostics.end(), [](const Diagnostic& a, const Diagnostic& b) {
+		return a.line != b.line ? a.line < b.line : a.column < b.column;
+	});
+	bool hasErrors = false;
+	for (const Diagnostic& diagnostic : diagnostics) {
+		std::cerr << formatDiagnostic(diagnostic, fileName, source);
+		hasErrors = hasErrors || diagnostic.severity == Severity::Error;
+	}
+	return hasErrors;
+}
+
+}
+
+// Exit status (spec 12.3): 0 on success, 1 for lexical, syntax or semantic
+// errors, 2 for runtime errors.
 int main(int argc, char* argv[]) {
 #ifdef _WIN32
 	SetConsoleOutputCP(CP_UTF8);
 #endif
-	enum class Show { Tokens, Ast, Types };
-	Show show = Show::Ast;
+	std::ios::sync_with_stdio(false);
+
+	enum class Mode { Run, Tokens, Ast, Types };
+	Mode mode = Mode::Run;
+	Environment::Options environmentOptions;
+	Evaluator::Options evaluatorOptions;
 	std::string fileName = "test.txt";
+
 	for (int i = 1; i < argc; ++i) {
 		std::string_view arg = argv[i];
-		if (arg == "--tokens") {
-			show = Show::Tokens;
+		if (arg == "--tokens") mode = Mode::Tokens;
+		else if (arg == "--ast") mode = Mode::Ast;
+		else if (arg == "--types") mode = Mode::Types;
+		else if (arg == "--strict") environmentOptions.strict = true;
+		else if (arg == "--defaults") environmentOptions.useDefaults = true;
+		else if (arg == "--help") {
+			std::cout << Usage;
+			return 0;
 		}
-		else if (arg == "--ast") {
-			show = Show::Ast;
-		}
-		else if (arg == "--types") {
-			show = Show::Types;
+		else if (arg == "--max-steps" || arg == "--max-depth") {
+			std::uint64_t count = 0;
+			if (i + 1 >= argc || !parseCount(argv[i + 1], count)) {
+				std::cerr << arg << " needs a positive whole number, as in " << arg << " 1000\n";
+				return 1;
+			}
+			++i;
+			if (arg == "--max-steps") evaluatorOptions.maxSteps = count;
+			else environmentOptions.maxDepth = static_cast<size_t>(count);
 		}
 		else if (arg.starts_with("--")) {
-			std::cerr << "Unknown option " << arg << "\nUsage: PseudocodeInterpreter [--tokens | --ast | --types] [file]\n";
+			std::cerr << "Unknown option " << arg << "\n" << Usage;
 			return 1;
 		}
 		else {
@@ -91,35 +137,49 @@ int main(int argc, char* argv[]) {
 	Lexer lexer(source);
 	std::vector<Token> tokens = lexer.tokenize();
 	std::vector<Diagnostic> diagnostics = lexer.diagnostics();
-
-	if (show == Show::Tokens) {
+	if (mode == Mode::Tokens) {
 		printTokens(tokens);
+		return report(diagnostics, fileName, source) ? 1 : 0;
 	}
-	else {
-		Parser parser(std::move(tokens));
-		Program program = parser.parse();
-		diagnostics.insert(diagnostics.end(), parser.diagnostics().begin(), parser.diagnostics().end());
 
-		// Semantic checks only make sense on a program that parsed cleanly.
-		TypeTable types;
-		if (!lexer.hasErrors() && !parser.hasErrors()) {
-			types.build(program);
-			Environment environment(program, types, {});
-			// Read after the environment exists: resolving signatures adds to the type table's diagnostics.
-			diagnostics.insert(diagnostics.end(), types.diagnostics().begin(), types.diagnostics().end());
-			diagnostics.insert(diagnostics.end(), environment.diagnostics().begin(), environment.diagnostics().end());
+	Parser parser(std::move(tokens));
+	Program program = parser.parse();
+	diagnostics.insert(diagnostics.end(), parser.diagnostics().begin(), parser.diagnostics().end());
+	if (lexer.hasErrors() || parser.hasErrors()) {
+		if (mode == Mode::Ast) {
+			std::cout << printAst(program);
 		}
-
-		std::cout << (show == Show::Types ? types.dump() : printAst(program));
+		report(diagnostics, fileName, source);
+		return 1;
 	}
 
-	std::stable_sort(diagnostics.begin(), diagnostics.end(), [](const Diagnostic& a, const Diagnostic& b) {
-		return a.line != b.line ? a.line < b.line : a.column < b.column;
-	});
-	bool hasErrors = false;
-	for (const Diagnostic& diagnostic : diagnostics) {
-		std::cerr << formatDiagnostic(diagnostic, fileName, source);
-		hasErrors = hasErrors || diagnostic.severity == Severity::Error;
+	TypeTable types;
+	types.build(program);
+	Environment environment(program, types, environmentOptions);
+	// Read after the environment exists: resolving signatures adds to the type table's diagnostics.
+	diagnostics.insert(diagnostics.end(), types.diagnostics().begin(), types.diagnostics().end());
+	diagnostics.insert(diagnostics.end(), environment.diagnostics().begin(), environment.diagnostics().end());
+
+	if (mode == Mode::Ast || mode == Mode::Types) {
+		std::cout << (mode == Mode::Ast ? printAst(program) : types.dump());
+		return report(diagnostics, fileName, source) ? 1 : 0;
 	}
-	return hasErrors ? 1 : 0;
+	// A program with errors found before running produces no output (spec 12).
+	if (report(diagnostics, fileName, source)) {
+		return 1;
+	}
+
+	Evaluator evaluator(program, environment, std::cin, std::cout, evaluatorOptions);
+	try {
+		if (std::optional<Diagnostic> error = evaluator.run()) {
+			std::cerr << formatDiagnostic(*error, fileName, source);
+			return 2;
+		}
+	}
+	catch (const std::exception& error) {
+		std::cout.flush();
+		std::cerr << fileName << ": Internal error in the interpreter: " << error.what() << "\n";
+		return 2;
+	}
+	return 0;
 }
