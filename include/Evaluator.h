@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <filesystem>
 #include <iosfwd>
 #include <map>
 #include <optional>
@@ -11,6 +12,7 @@
 #include "Builtins.h"
 #include "Diagnostic.h"
 #include "Environment.h"
+#include "Files.h"
 #include "RuntimeError.h"
 #include "Value.h"
 
@@ -22,13 +24,12 @@
 // at the innermost expression or statement it came from, with the chain of
 // active calls.
 //
-// Not yet supported: the file statements of spec 10 and the EOF function.
-// Using one stops the program with error R000.
 class Evaluator {
 public:
 	struct Options {
 		std::uint64_t maxSteps = 0; // --max-steps: stop after this many statements; 0 for no limit (spec 7.8)
 		std::optional<std::uint64_t> seed; // --seed: makes RAND repeatable (spec 9.2)
+		std::filesystem::path baseDirectory; // where relative file names are found: the program's folder (spec 10)
 	};
 
 	// `environment` must have been made from `program` and is used as is, so
@@ -38,8 +39,12 @@ public:
 
 	// Runs the top-level statements, on a thread with a large stack. Returns
 	// the runtime error that stopped the program, if any. Output is flushed
-	// either way.
+	// and files left open are closed either way.
 	std::optional<Diagnostic> run();
+
+	// Warnings from the run: files still open at the end of a program that
+	// finished normally (W004).
+	const std::vector<Diagnostic>& warnings() const { return warnings_; }
 
 private:
 	// How a statement finished: normally, or by RETURN, which unwinds to the
@@ -64,6 +69,7 @@ private:
 	};
 
 	std::optional<Diagnostic> runStatements();
+	void closeOpenFiles(bool stoppedByError);
 
 	// Statements
 	Flow execute(const Stmt& stmt);
@@ -77,6 +83,8 @@ private:
 	Flow executeFor(const ForStmt& node);
 	Flow executeReturn(const ReturnStmt& node);
 	void executeDefine(const DefineStmt& node);
+	Flow executeFile(const Stmt& stmt);
+	std::string fileName(const Expr& expr);
 
 	// Expressions
 	Value evaluate(const Expr& expr);
@@ -114,6 +122,7 @@ private:
 	std::istream& input_;
 	std::ostream& output_;
 	Options options_;
+	Files files_;
 	Builtins builtins_;
 	BoundEvaluator evaluateBound_;
 	std::uint64_t steps_ = 0;
@@ -121,4 +130,5 @@ private:
 	size_t stackLimit_ = 0;         // stack bytes a program may use before R011
 	Value returnValue_; // set by RETURN, taken by the function call
 	std::map<const TypeSpec*, const Type*> resolvedTypes_;
+	std::vector<Diagnostic> warnings_;
 };

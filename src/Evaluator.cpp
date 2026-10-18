@@ -75,25 +75,13 @@ Value literalValue(const Literal& literal) {
 	return std::visit([](const auto& value) -> Value { return value; }, literal);
 }
 
-std::string_view fileStatementName(const Stmt& stmt) {
-	return std::visit(Overloaded{
-		[](const OpenFileStmt&) { return "OPENFILE"; },
-		[](const ReadFileStmt&) { return "READFILE"; },
-		[](const WriteFileStmt&) { return "WRITEFILE"; },
-		[](const CloseFileStmt&) { return "CLOSEFILE"; },
-		[](const SeekStmt&) { return "SEEK"; },
-		[](const GetRecordStmt&) { return "GETRECORD"; },
-		[](const PutRecordStmt&) { return "PUTRECORD"; },
-		[](const auto&) { return ""; },
-	}, stmt.node);
-}
-
 }
 
 Evaluator::Evaluator(const Program& program, Environment& environment, std::istream& input, std::ostream& output,
 	Options options)
 	: program_(program), environment_(environment), types_(environment.types()),
-	  input_(input), output_(output), options_(options), builtins_(options.seed) {
+	  input_(input), output_(output), options_(options),
+	  files_(options.baseDirectory), builtins_(options.seed, files_) {
 	evaluateBound_ = [this](const Expr& expr) { return integer(expr, "An array bound"); };
 }
 
@@ -129,9 +117,34 @@ std::optional<Diagnostic> Evaluator::runStatements() {
 		}
 	}
 	catch (const LocatedError& error) {
+		closeOpenFiles(true);
 		return error.diagnostic;
 	}
+	closeOpenFiles(false);
 	return std::nullopt;
+}
+
+// Spec 10.1: files still open when the program ends are closed with a
+// warning. After a runtime error they are closed quietly, since the program
+// never reached its CLOSEFILE, unless writing one back failed.
+void Evaluator::closeOpenFiles(bool stoppedByError) {
+	for (const Files::LeftOpen& file : files_.closeAll()) {
+		if (stoppedByError && file.error.empty()) {
+			continue;
+		}
+		Diagnostic warning;
+		warning.severity = Severity::Warning;
+		warning.phase = Phase::Runtime;
+		warning.code = "W004";
+		warning.line = file.openedAt.line;
+		warning.column = file.openedAt.column;
+		warning.message = "The file \"" + file.name + "\" was still open when the program ended, so it was closed "
+			"automatically. Close it with CLOSEFILE";
+		if (!file.error.empty()) {
+			warning.message += ". " + file.error;
+		}
+		warnings_.push_back(std::move(warning));
+	}
 }
 
 Evaluator::LocatedError Evaluator::located(const RuntimeError& error, SourceLocation location) const {
@@ -228,9 +241,7 @@ Evaluator::Flow Evaluator::executeNode(const Stmt& stmt) {
 		},
 		[&](const ReturnStmt& node) { return executeReturn(node); },
 		[&](const DefineStmt& node) { executeDefine(node); return Flow::Normal; },
-		[&](const auto&) -> Flow {
-			throw RuntimeError("R000", std::string(fileStatementName(stmt)) + ": file handling is not supported yet");
-		},
+		[&](const auto&) { return executeFile(stmt); },
 	}, stmt.node);
 }
 
@@ -405,6 +416,74 @@ void Evaluator::executeDefine(const DefineStmt& node) {
 		}
 	}
 	environment_.defineConstant(node.name, SetRef(std::move(set)), &node);
+}
+
+// ---------- files (spec 10) ----------
+
+// Every file statement names its file first, so that is evaluated first.
+Evaluator::Flow Evaluator::executeFile(const Stmt& stmt) {
+	std::visit(Overloaded{
+		[&](const OpenFileStmt& node) {
+			files_.open(fileName(*node.file), node.mode, stmt.location);
+		},
+		[&](const CloseFileStmt& node) {
+			files_.close(fileName(*node.file));
+		},
+		[&](const ReadFileStmt& node) {
+			std::string name = fileName(*node.file);
+			Place target = requirePlace(*node.target, true);
+			if (target.cell->type && target.cell->type->kind != TypeKind::String) {
+				throw RuntimeError("R002", "READFILE reads a line of text, so " + target.text + " must be a STRING, but it is "
+					+ describeType(target.cell->type) + ". Read into a STRING, then convert it with STR_TO_NUM");
+			}
+			storeValue(*target.cell, files_.readLine(name));
+		},
+		[&](const WriteFileStmt& node) {
+			std::string name = fileName(*node.file);
+			Value value = evaluate(*node.value);
+			const Type* type = typeOf(value);
+			if (!type || !(type->isAtomic() || type->kind == TypeKind::Enum)) {
+				std::string message = "WRITEFILE writes one value per line, so it cannot write " + describeType(type);
+				if (type && type->kind == TypeKind::Array) message += ". Write its elements one at a time";
+				if (type && type->kind == TypeKind::Record) message += ". Write its fields one at a time, or use a random file";
+				throw located(RuntimeError("R002", message), node.value->location);
+			}
+			files_.writeLine(name, formatValue(value));
+		},
+		[&](const SeekStmt& node) {
+			std::string name = fileName(*node.file);
+			files_.seek(name, integer(*node.address, "The record address"));
+		},
+		[&](const GetRecordStmt& node) {
+			std::string name = fileName(*node.file);
+			Place target = requirePlace(*node.target, true);
+			files_.getRecord(name, *target.cell, target.text);
+		},
+		[&](const PutRecordStmt& node) {
+			std::string name = fileName(*node.file);
+			std::optional<Place> source = place(*node.source, false);
+			if (!source) {
+				evaluate(*node.source); // reports an undeclared or unassigned name
+				throw RuntimeError("R002", "PUTRECORD writes a variable, array element or field");
+			}
+			files_.putRecord(name, *source->cell, source->text);
+		},
+		[&](const auto&) {},
+	}, stmt.node);
+	return Flow::Normal;
+}
+
+// Spec 10: a file is named by a STRING, written directly or held in a variable.
+std::string Evaluator::fileName(const Expr& expr) {
+	Value value = evaluate(expr);
+	if (const auto* text = std::get_if<std::string>(&value)) {
+		return *text;
+	}
+	if (const auto* c = std::get_if<char>(&value)) {
+		return std::string(1, *c);
+	}
+	throw located(RuntimeError("R002", "A file name must be a STRING, such as \"Data.txt\", but this is "
+		+ describeType(typeOf(value))), expr.location);
 }
 
 // ---------- expressions ----------

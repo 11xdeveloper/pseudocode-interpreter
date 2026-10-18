@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <charconv>
 #include <cstdint>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -181,10 +182,18 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
+	// Spec 10: file names are relative to the program's folder.
+	evaluatorOptions.baseDirectory = std::filesystem::path(std::u8string(fileName.begin(), fileName.end())).parent_path();
 	Evaluator evaluator(program, environment, std::cin, std::cout, evaluatorOptions);
 	try {
-		if (std::optional<Diagnostic> error = evaluator.run()) {
+		std::optional<Diagnostic> error = evaluator.run();
+		if (error) {
 			std::cerr << formatDiagnostic(*error, fileName, source);
+		}
+		for (const Diagnostic& warning : evaluator.warnings()) {
+			std::cerr << formatDiagnostic(warning, fileName, source);
+		}
+		if (error) {
 			return 2;
 		}
 	}

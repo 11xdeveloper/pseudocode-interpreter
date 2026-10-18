@@ -11,6 +11,8 @@
 #include "RuntimeError.h"
 #include "Value.h"
 
+class Files;
+
 // The built-in functions of spec 9.
 //
 // Arguments follow the implicit conversions of spec 4.3: a CHAR is accepted
@@ -34,8 +36,9 @@ private:
 
 class Builtins {
 public:
-	// `seed` makes RAND repeatable (--seed); without one RAND is seeded randomly.
-	explicit Builtins(std::optional<std::uint64_t> seed);
+	// `seed` makes RAND repeatable (--seed); without one RAND is seeded
+	// randomly. EOF asks `files`, which must outlive this object.
+	Builtins(std::optional<std::uint64_t> seed, Files& files);
 
 	// Calls a built-in function with its arguments, already evaluated left
 	// to right. Throws M003 for the wrong number of arguments, ArgumentError
@@ -49,4 +52,5 @@ private:
 	double random(std::int64_t limit);
 
 	std::mt19937_64 generator_;
+	Files& files_;
 };

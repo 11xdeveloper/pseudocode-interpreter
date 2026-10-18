@@ -5,6 +5,7 @@
 #include <cmath>
 #include <ctime>
 
+#include "Files.h"
 #include "Operations.h"
 
 namespace {
@@ -237,7 +238,7 @@ bool isBuiltinFunction(std::string_view name) {
 	return findFunction(name) != nullptr;
 }
 
-Builtins::Builtins(std::optional<std::uint64_t> seed) {
+Builtins::Builtins(std::optional<std::uint64_t> seed, Files& files) : files_(files) {
 	if (seed) {
 		generator_.seed(*seed);
 	}
@@ -406,7 +407,7 @@ Value Builtins::call(std::string_view name, std::vector<Value> values) {
 		return today();
 
 	case Id::Eof:
-		throw RuntimeError("R000", "EOF needs file handling, which is not supported yet");
+		return files_.atEnd(arguments.text(0));
 	}
 	return {};
 }
