@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "RuntimeError.h"
+#include "Types.h"
 #include "Value.h"
 
 class Files;
@@ -21,6 +22,18 @@ class Files;
 
 // Whether `name` is a built-in function. These names are reserved (spec 2.2).
 bool isBuiltinFunction(std::string_view name);
+
+// The check of a built-in call against spec 9, used before running with the
+// argument types known then (nullptr where not known), and again when it runs.
+struct BuiltinCheck {
+	const Type* result = nullptr; // the call's type; nullptr if known only when it runs
+	std::string error;            // empty if the call is allowed
+	std::string code;             // M003 for the wrong number of arguments, M004 for a wrong type
+	size_t argument = 0;          // for M004: which argument is wrong
+
+	bool ok() const { return error.empty(); }
+};
+BuiltinCheck checkBuiltinCall(std::string_view name, const std::vector<const Type*>& argumentTypes);
 
 // An argument of the wrong type (R002). `index` says which argument, so the
 // error can point at it.

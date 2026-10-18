@@ -18,43 +18,50 @@ enum class Id {
 	Eof,
 };
 
+// Parameter kinds: S STRING (a CHAR is accepted, spec 4.3), C CHAR,
+// I INTEGER, R REAL (an INTEGER is accepted), N INTEGER or REAL,
+// T CHAR or STRING, kept as it is, D DATE.
+// Result: I INTEGER, R REAL, C CHAR, S STRING, B BOOLEAN, D DATE,
+// = the same type as the first argument, ? known only when it runs.
 struct Function {
 	std::string_view name;
 	Id id;
 	std::array<std::string_view, 3> parameters;
 	size_t count;
+	std::string_view kinds;
+	char result;
 };
 
 constexpr std::array<Function, 25> functions = { {
 	// Spec 9.1: string and character functions
-	{ "LENGTH", Id::Length, { "S" }, 1 },
-	{ "LEFT", Id::Left, { "S", "X" }, 2 },
-	{ "RIGHT", Id::Right, { "S", "X" }, 2 },
-	{ "MID", Id::Mid, { "S", "X", "Y" }, 3 },
-	{ "LCASE", Id::Lcase, { "C" }, 1 },
-	{ "UCASE", Id::Ucase, { "C" }, 1 },
-	{ "TO_LOWER", Id::ToLower, { "S" }, 1 },
-	{ "TO_UPPER", Id::ToUpper, { "S" }, 1 },
-	{ "NUM_TO_STR", Id::NumToStr, { "N" }, 1 },
-	{ "STR_TO_NUM", Id::StrToNum, { "S" }, 1 },
-	{ "IS_NUM", Id::IsNum, { "S" }, 1 },
-	{ "ASC", Id::Asc, { "C" }, 1 },
-	{ "CHR", Id::Chr, { "X" }, 1 },
+	{ "LENGTH", Id::Length, { "S" }, 1, "S", 'I' },
+	{ "LEFT", Id::Left, { "S", "X" }, 2, "SI", 'S' },
+	{ "RIGHT", Id::Right, { "S", "X" }, 2, "SI", 'S' },
+	{ "MID", Id::Mid, { "S", "X", "Y" }, 3, "SII", 'S' },
+	{ "LCASE", Id::Lcase, { "C" }, 1, "C", 'C' },
+	{ "UCASE", Id::Ucase, { "C" }, 1, "C", 'C' },
+	{ "TO_LOWER", Id::ToLower, { "S" }, 1, "T", '=' },
+	{ "TO_UPPER", Id::ToUpper, { "S" }, 1, "T", '=' },
+	{ "NUM_TO_STR", Id::NumToStr, { "N" }, 1, "N", 'S' },
+	{ "STR_TO_NUM", Id::StrToNum, { "S" }, 1, "S", '?' },
+	{ "IS_NUM", Id::IsNum, { "S" }, 1, "S", 'B' },
+	{ "ASC", Id::Asc, { "C" }, 1, "C", 'I' },
+	{ "CHR", Id::Chr, { "X" }, 1, "I", 'C' },
 	// Spec 9.2: numeric functions
-	{ "INT", Id::Int, { "X" }, 1 },
-	{ "RAND", Id::Rand, { "X" }, 1 },
-	{ "ROUND", Id::Round, { "X", "Places" }, 2 },
-	{ "MOD", Id::Mod, { "A", "B" }, 2 },
-	{ "DIV", Id::Div, { "A", "B" }, 2 },
+	{ "INT", Id::Int, { "X" }, 1, "R", 'I' },
+	{ "RAND", Id::Rand, { "X" }, 1, "I", 'R' },
+	{ "ROUND", Id::Round, { "X", "Places" }, 2, "RI", 'R' },
+	{ "MOD", Id::Mod, { "A", "B" }, 2, "II", 'I' },
+	{ "DIV", Id::Div, { "A", "B" }, 2, "II", 'I' },
 	// Spec 9.3: date functions
-	{ "DAY", Id::Day, { "D" }, 1 },
-	{ "MONTH", Id::Month, { "D" }, 1 },
-	{ "YEAR", Id::Year, { "D" }, 1 },
-	{ "DAYINDEX", Id::DayIndex, { "D" }, 1 },
-	{ "SETDATE", Id::SetDate, { "Day", "Month", "Year" }, 3 },
-	{ "NOW", Id::Now, {}, 0 },
+	{ "DAY", Id::Day, { "D" }, 1, "D", 'I' },
+	{ "MONTH", Id::Month, { "D" }, 1, "D", 'I' },
+	{ "YEAR", Id::Year, { "D" }, 1, "D", 'I' },
+	{ "DAYINDEX", Id::DayIndex, { "D" }, 1, "D", 'I' },
+	{ "SETDATE", Id::SetDate, { "Day", "Month", "Year" }, 3, "III", 'D' },
+	{ "NOW", Id::Now, {}, 0, "", 'D' },
 	// Spec 9.4: file function
-	{ "EOF", Id::Eof, { "F" }, 1 },
+	{ "EOF", Id::Eof, { "F" }, 1, "S", 'B' },
 } };
 
 std::string toUpper(std::string_view text) {
@@ -80,79 +87,125 @@ const Function* findFunction(std::string_view name) {
 	return nullptr;
 }
 
-// Checked access to one call's arguments, with messages naming the function
-// and parameter.
+// "MID(S, X, Y)"
+std::string signatureOf(const Function& function) {
+	std::string text(function.name);
+	text += '(';
+	for (size_t i = 0; i < function.count; ++i) {
+		text += (i > 0 ? ", " : "") + std::string(function.parameters[i]);
+	}
+	return text + ')';
+}
+
+// Why an argument of type `actual` does not fit parameter `i`, or nothing if
+// it does. A null `actual` is unknown before running, which passes, but at
+// runtime is a null object, which does not.
+std::optional<std::string> argumentProblem(const Function& function, size_t i, const Type* actual, bool atRuntime) {
+	if (!actual && !atRuntime) {
+		return std::nullopt;
+	}
+	auto is = [&](TypeKind kind) { return actual && actual->kind == kind; };
+	bool text = actual && actual->isText();
+	bool number = actual && actual->isNumeric();
+
+	std::string_view expected;
+	std::string hint;
+	switch (function.kinds[i]) {
+	case 'S':
+		if (text) return std::nullopt;
+		expected = "a STRING";
+		if (number) hint = "Use NUM_TO_STR to turn a number into text";
+		break;
+	case 'C':
+		if (is(TypeKind::Char)) return std::nullopt;
+		expected = "a CHAR";
+		if (is(TypeKind::String)) {
+			hint = function.id == Id::Lcase ? "Use TO_LOWER for a STRING"
+				: function.id == Id::Ucase ? "Use TO_UPPER for a STRING"
+				: "A STRING cannot become a CHAR, even if it is one character long";
+		}
+		break;
+	case 'I':
+		if (is(TypeKind::Integer)) return std::nullopt;
+		expected = "an INTEGER";
+		if (is(TypeKind::Real)) hint = "Use INT() to convert a REAL";
+		if (text) hint = "Use STR_TO_NUM to turn text into a number";
+		break;
+	case 'R':
+		if (number) return std::nullopt;
+		expected = "a REAL";
+		if (text) hint = "Use STR_TO_NUM to turn text into a number";
+		break;
+	case 'N':
+		if (number) return std::nullopt;
+		expected = "an INTEGER or REAL";
+		break;
+	case 'T':
+		if (text) return std::nullopt;
+		expected = "a CHAR or STRING";
+		break;
+	case 'D':
+		if (is(TypeKind::Date)) return std::nullopt;
+		expected = "a DATE";
+		if (text) hint = "Write a date as dd/mm/yyyy, or build one with SETDATE";
+		break;
+	}
+	std::string message = std::string(function.name) + " needs " + std::string(expected) + " for "
+		+ std::string(function.parameters[i]) + ", but this is " + (actual ? describeType(actual) : "a null object");
+	if (!hint.empty()) {
+		message += ". " + hint;
+	}
+	return message;
+}
+
+BuiltinCheck check(const Function& function, const std::vector<const Type*>& argumentTypes, bool atRuntime) {
+	if (argumentTypes.size() != function.count) {
+		return { nullptr, signatureOf(function) + " takes " + std::to_string(function.count)
+			+ (function.count == 1 ? " argument" : " arguments") + ", but " + std::to_string(argumentTypes.size())
+			+ (argumentTypes.size() == 1 ? " was" : " were") + " given", "M003", 0 };
+	}
+	for (size_t i = 0; i < argumentTypes.size(); ++i) {
+		if (std::optional<std::string> problem = argumentProblem(function, i, argumentTypes[i], atRuntime)) {
+			return { nullptr, std::move(*problem), atRuntime ? "R002" : "M004", i };
+		}
+	}
+	BuiltinCheck allowed;
+	switch (function.result) {
+	case 'I': allowed.result = integerType(); break;
+	case 'R': allowed.result = realType(); break;
+	case 'C': allowed.result = charType(); break;
+	case 'S': allowed.result = stringType(); break;
+	case 'B': allowed.result = booleanType(); break;
+	case 'D': allowed.result = dateType(); break;
+	case '=': allowed.result = argumentTypes[0]; break;
+	default:  break;
+	}
+	return allowed;
+}
+
+// One call's arguments, already checked against the function's kinds.
 class Arguments {
 public:
-	Arguments(const Function& function, std::vector<Value>& values) : function_(function), values_(values) {
-		if (values.size() != function.count) {
-			throw RuntimeError("M003", signature() + " takes " + std::to_string(function.count)
-				+ (function.count == 1 ? " argument" : " arguments") + ", but " + std::to_string(values.size())
-				+ (values.size() == 1 ? " was" : " were") + " given");
-		}
-	}
-
-	// "MID(S, X, Y)"
-	std::string signature() const {
-		std::string text(function_.name);
-		text += '(';
-		for (size_t i = 0; i < function_.count; ++i) {
-			text += (i > 0 ? ", " : "") + std::string(function_.parameters[i]);
-		}
-		return text + ')';
-	}
+	explicit Arguments(const std::vector<Value>& values) : values_(values) {}
 
 	const Value& value(size_t i) const { return values_[i]; }
 
-	[[noreturn]] void wrongType(size_t i, std::string_view expected, std::string_view hint = {}) const {
-		std::string message = std::string(function_.name) + " needs " + std::string(expected) + " for "
-			+ std::string(function_.parameters[i]) + ", but this is " + describeType(typeOf(values_[i]));
-		if (!hint.empty()) {
-			message += ". " + std::string(hint);
-		}
-		throw ArgumentError(i, message);
-	}
-
 	std::string text(size_t i) const {
-		if (const auto* s = std::get_if<std::string>(&values_[i])) return *s;
 		if (const auto* c = std::get_if<char>(&values_[i])) return std::string(1, *c);
-		wrongType(i, "a STRING", isNumber(i) ? "Use NUM_TO_STR to turn a number into text" : "");
+		return std::get<std::string>(values_[i]);
 	}
 
-	char character(size_t i) const {
-		if (const auto* c = std::get_if<char>(&values_[i])) return *c;
-		wrongType(i, "a CHAR", std::holds_alternative<std::string>(values_[i])
-			? "A STRING cannot become a CHAR, even if it is one character long" : "");
-	}
-
-	std::int64_t integer(size_t i) const {
-		if (const auto* n = std::get_if<std::int64_t>(&values_[i])) return *n;
-		if (std::holds_alternative<double>(values_[i])) wrongType(i, "an INTEGER", "Use INT() to convert a REAL");
-		wrongType(i, "an INTEGER", isText(i) ? "Use STR_TO_NUM to turn text into a number" : "");
-	}
+	char character(size_t i) const { return std::get<char>(values_[i]); }
+	std::int64_t integer(size_t i) const { return std::get<std::int64_t>(values_[i]); }
+	Date date(size_t i) const { return std::get<Date>(values_[i]); }
 
 	double real(size_t i) const {
-		if (const auto* n = std::get_if<double>(&values_[i])) return *n;
 		if (const auto* n = std::get_if<std::int64_t>(&values_[i])) return static_cast<double>(*n);
-		wrongType(i, "a REAL", isText(i) ? "Use STR_TO_NUM to turn text into a number" : "");
-	}
-
-	Date date(size_t i) const {
-		if (const auto* d = std::get_if<Date>(&values_[i])) return *d;
-		wrongType(i, "a DATE", isText(i) ? "Write a date as dd/mm/yyyy, or build one with SETDATE" : "");
-	}
-
-	bool isNumber(size_t i) const {
-		return std::holds_alternative<std::int64_t>(values_[i]) || std::holds_alternative<double>(values_[i]);
-	}
-
-	bool isText(size_t i) const {
-		return std::holds_alternative<std::string>(values_[i]) || std::holds_alternative<char>(values_[i]);
+		return std::get<double>(values_[i]);
 	}
 
 private:
-	const Function& function_;
-	std::vector<Value>& values_;
+	const std::vector<Value>& values_;
 };
 
 [[noreturn]] void invalid(const std::string& message) {
@@ -238,6 +291,14 @@ bool isBuiltinFunction(std::string_view name) {
 	return findFunction(name) != nullptr;
 }
 
+BuiltinCheck checkBuiltinCall(std::string_view name, const std::vector<const Type*>& argumentTypes) {
+	const Function* function = findFunction(name);
+	if (!function) {
+		return { nullptr, "There is no built-in function called " + std::string(name), "M001", 0 };
+	}
+	return check(*function, argumentTypes, false);
+}
+
 Builtins::Builtins(std::optional<std::uint64_t> seed, Files& files) : files_(files) {
 	if (seed) {
 		generator_.seed(*seed);
@@ -261,7 +322,18 @@ Value Builtins::call(std::string_view name, std::vector<Value> values) {
 	if (!function) {
 		throw RuntimeError("M001", "There is no built-in function called " + std::string(name));
 	}
-	Arguments arguments(*function, values);
+	std::vector<const Type*> types;
+	for (const Value& value : values) {
+		types.push_back(typeOf(value));
+	}
+	BuiltinCheck problem = check(*function, types, true);
+	if (!problem.ok()) {
+		if (problem.code == "M003") {
+			throw RuntimeError("M003", problem.error);
+		}
+		throw ArgumentError(problem.argument, problem.error);
+	}
+	Arguments arguments(values);
 
 	switch (function->id) {
 	case Id::Length:
@@ -299,9 +371,6 @@ Value Builtins::call(std::string_view name, std::vector<Value> values) {
 
 	case Id::Lcase:
 	case Id::Ucase: {
-		if (std::holds_alternative<std::string>(arguments.value(0))) {
-			arguments.wrongType(0, "a CHAR", function->id == Id::Lcase ? "Use TO_LOWER for a STRING" : "Use TO_UPPER for a STRING");
-		}
 		char c = arguments.character(0);
 		return function->id == Id::Lcase ? lower(c) : upper(c);
 	}
@@ -312,20 +381,14 @@ Value Builtins::call(std::string_view name, std::vector<Value> values) {
 		if (const auto* c = std::get_if<char>(&arguments.value(0))) {
 			return convert(*c);
 		}
-		if (const auto* s = std::get_if<std::string>(&arguments.value(0))) {
-			std::string result = *s;
-			for (char& c : result) {
-				c = convert(c);
-			}
-			return result;
+		std::string result = std::get<std::string>(arguments.value(0));
+		for (char& c : result) {
+			c = convert(c);
 		}
-		arguments.wrongType(0, "a CHAR or STRING");
+		return result;
 	}
 
 	case Id::NumToStr:
-		if (!arguments.isNumber(0)) {
-			arguments.wrongType(0, "an INTEGER or REAL");
-		}
 		return formatValue(arguments.value(0));
 
 	case Id::StrToNum: {

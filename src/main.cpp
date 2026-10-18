@@ -9,6 +9,7 @@
 #include <string_view>
 #include <variant>
 
+#include "Analyzer.h"
 #include "AstPrinter.h"
 #include "Environment.h"
 #include "Evaluator.h"
@@ -169,9 +170,13 @@ int main(int argc, char* argv[]) {
 	TypeTable types;
 	types.build(program);
 	Environment environment(program, types, environmentOptions);
-	// Read after the environment exists: resolving signatures adds to the type table's diagnostics.
+	// The semantic phase (spec 12): everything that can be checked before running.
+	Analyzer analyzer(program, types, environment, { environmentOptions.strict });
+	analyzer.analyze();
+	// Read last: resolving signatures and declarations adds to the type table's diagnostics.
 	diagnostics.insert(diagnostics.end(), types.diagnostics().begin(), types.diagnostics().end());
 	diagnostics.insert(diagnostics.end(), environment.diagnostics().begin(), environment.diagnostics().end());
+	diagnostics.insert(diagnostics.end(), analyzer.diagnostics().begin(), analyzer.diagnostics().end());
 
 	if (mode == Mode::Ast || mode == Mode::Types) {
 		std::cout << (mode == Mode::Ast ? printAst(program) : types.dump());
