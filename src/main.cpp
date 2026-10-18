@@ -59,6 +59,7 @@ constexpr const char* Usage =
 	"  --defaults      variables start as 0, 0.0, \"\", FALSE and so on\n"
 	"  --max-steps N   stop after N statements (catches endless loops)\n"
 	"  --max-depth N   allow calls to nest N deep (default 10000)\n"
+	"  --seed N        make RAND give the same numbers on every run\n"
 	"  --tokens        print the tokens instead of running\n"
 	"  --ast           print the syntax tree instead of running\n"
 	"  --types         print the defined types instead of running\n";
@@ -107,6 +108,17 @@ int main(int argc, char* argv[]) {
 		else if (arg == "--help") {
 			std::cout << Usage;
 			return 0;
+		}
+		else if (arg == "--seed") {
+			std::uint64_t seed = 0;
+			std::string_view text = i + 1 < argc ? argv[i + 1] : "";
+			auto result = std::from_chars(text.data(), text.data() + text.size(), seed);
+			if (text.empty() || result.ec != std::errc() || result.ptr != text.data() + text.size()) {
+				std::cerr << "--seed needs a whole number, as in --seed 42\n";
+				return 1;
+			}
+			++i;
+			evaluatorOptions.seed = seed;
 		}
 		else if (arg == "--max-steps" || arg == "--max-depth") {
 			std::uint64_t count = 0;

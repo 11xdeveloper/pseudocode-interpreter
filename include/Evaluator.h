@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "Ast.h"
+#include "Builtins.h"
 #include "Diagnostic.h"
 #include "Environment.h"
 #include "RuntimeError.h"
@@ -21,12 +22,13 @@
 // at the innermost expression or statement it came from, with the chain of
 // active calls.
 //
-// Not yet supported: the built-in functions of spec 9 and the file
-// statements of spec 10. Using one stops the program with error R000.
+// Not yet supported: the file statements of spec 10 and the EOF function.
+// Using one stops the program with error R000.
 class Evaluator {
 public:
 	struct Options {
 		std::uint64_t maxSteps = 0; // --max-steps: stop after this many statements; 0 for no limit (spec 7.8)
+		std::optional<std::uint64_t> seed; // --seed: makes RAND repeatable (spec 9.2)
 	};
 
 	// `environment` must have been made from `program` and is used as is, so
@@ -112,6 +114,7 @@ private:
 	std::istream& input_;
 	std::ostream& output_;
 	Options options_;
+	Builtins builtins_;
 	BoundEvaluator evaluateBound_;
 	std::uint64_t steps_ = 0;
 	std::uintptr_t stackBase_ = 0; // stack position when the program started

@@ -1,7 +1,6 @@
 #include "Environment.h"
 
 #include <algorithm>
-#include <array>
 
 #include "RuntimeError.h"
 
@@ -44,17 +43,6 @@ bool canSee(const Method& method, const Type* fromClass) {
 	return method.definition->visibility == Visibility::Public || method.owner == fromClass;
 }
 
-}
-
-bool isBuiltinFunction(std::string_view name) {
-	static constexpr std::array<std::string_view, 25> names = {
-		"LENGTH", "LEFT", "RIGHT", "MID", "LCASE", "UCASE", "TO_LOWER", "TO_UPPER",
-		"NUM_TO_STR", "STR_TO_NUM", "IS_NUM", "ASC", "CHR",
-		"INT", "RAND", "ROUND", "MOD", "DIV",
-		"DAY", "MONTH", "YEAR", "DAYINDEX", "SETDATE", "NOW",
-		"EOF",
-	};
-	return std::find(names.begin(), names.end(), toUpper(name)) != names.end();
 }
 
 // ---------- Scope ----------

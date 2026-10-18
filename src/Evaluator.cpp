@@ -93,7 +93,7 @@ std::string_view fileStatementName(const Stmt& stmt) {
 Evaluator::Evaluator(const Program& program, Environment& environment, std::istream& input, std::ostream& output,
 	Options options)
 	: program_(program), environment_(environment), types_(environment.types()),
-	  input_(input), output_(output), options_(options) {
+	  input_(input), output_(output), options_(options), builtins_(options.seed) {
 	evaluateBound_ = [this](const Expr& expr) { return integer(expr, "An array bound"); };
 }
 
@@ -757,6 +757,17 @@ Value Evaluator::construct(const NewExpr& node) {
 	return object;
 }
 
-Value Evaluator::callBuiltin(const Callable& callable, const std::vector<ExprPtr>&) {
-	throw RuntimeError("R000", "The built-in function " + callable.name + " is not supported yet");
+// Spec 9: all arguments are passed by value, evaluated left to right.
+Value Evaluator::callBuiltin(const Callable& callable, const std::vector<ExprPtr>& arguments) {
+	std::vector<Value> values;
+	values.reserve(arguments.size());
+	for (const ExprPtr& argument : arguments) {
+		values.push_back(evaluate(*argument));
+	}
+	try {
+		return builtins_.call(callable.name, std::move(values));
+	}
+	catch (const ArgumentError& error) {
+		throw located(error, arguments[error.index()]->location);
+	}
 }

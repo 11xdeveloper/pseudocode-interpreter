@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "Ast.h"
+#include "Builtins.h"
 #include "Diagnostic.h"
 #include "Types.h"
 #include "Value.h"
@@ -23,9 +24,6 @@
 // Some checks here belong to the semantic phase, which catches them before
 // the program runs. The environment repeats them so it is safe on its own;
 // such errors are thrown as RuntimeError carrying their M code.
-
-// The built-in function names of spec 9, which are reserved (spec 2.2).
-bool isBuiltinFunction(std::string_view name);
 
 struct Variable {
 	std::string name; // spelling where it was declared or first assigned (spec 2.2)
