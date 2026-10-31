@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pseudocode Interpreter</title>
+<style>
+	body { font-family: system-ui, sans-serif; max-width: 50rem; margin: 2rem auto; padding: 0 1rem; }
+	textarea, pre { box-sizing: border-box; width: 100%; font: 0.9rem ui-monospace, monospace; }
+	textarea { padding: 0.5rem; }
+	pre { min-height: 4rem; padding: 0.5rem; background: #f4f4f4; white-space: pre-wrap; }
+	#stderr { color: #a00; }
+	label { display: block; margin-top: 1rem; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>Pseudocode Interpreter</h1>
+
+<label for="source">Program</label>
+<textarea id="source" rows="12" spellcheck="false">DECLARE Name : STRING
+DECLARE Count : INTEGER
+OUTPUT "What is your name?"
+INPUT Name
+FOR Count ← 1 TO 3
+   OUTPUT "Hello, ", Name, " (", Count, ")"
+NEXT Count</textarea>
+
+<label for="input">Input, one line per INPUT</label>
+<textarea id="input" rows="3" spellcheck="false">Ada</textarea>
+
+<p><button id="run" disabled>Loading…</button></p>
+
+<label>Output</label>
+<pre id="stdout"></pre>
+<pre id="stderr"></pre>
+
+<script type="module">
+	import { runPseudocode } from './pseudocode.mjs';
+
+	const run = document.getElementById('run');
+	run.textContent = 'Run';
+	run.disabled = false;
+	run.addEventListener('click', async () => {
+		run.disabled = true;
+		const input = document.getElementById('input').value;
+		const result = await runPseudocode(document.getElementById('source').value, {
+			input: input.endsWith('\n') || input === '' ? input : input + '\n',
+			args: ['--max-steps', '10000000'],
+		});
+		document.getElementById('stdout').textContent = result.stdout;
+		document.getElementById('stderr').textContent = result.stderr
+			+ (result.exitCode === 0 ? '' : `(exit status ${result.exitCode})`);
+		run.disabled = false;
+	});
+</script>
+</body>
+</html>

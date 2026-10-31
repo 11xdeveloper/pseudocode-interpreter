@@ -11,6 +11,8 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
+#elif defined(__EMSCRIPTEN__)
+#include <emscripten/stack.h>
 #else
 #include <pthread.h>
 #endif
@@ -48,6 +50,13 @@ bool runOnLargeStack(std::function<void()>& body) {
 	WaitForSingleObject(thread, INFINITE);
 	CloseHandle(thread);
 	return true;
+}
+#elif defined(__EMSCRIPTEN__)
+// WebAssembly has threads only where the page allows shared memory, so
+// programs run on the calling thread. Its stack is set when linking
+// (STACK_SIZE in CMakeLists.txt), so the limit is what is free of it.
+bool runOnLargeStack(std::function<void()>&) {
+	return false;
 }
 #else
 void* threadEntry(void* body) {
@@ -98,7 +107,12 @@ std::optional<Diagnostic> Evaluator::run() {
 	};
 	stackLimit_ = StackSize - StackMargin;
 	if (!runOnLargeStack(body)) {
+#ifdef __EMSCRIPTEN__
+		size_t free = emscripten_stack_get_free();
+		stackLimit_ = free > 2 * StackMargin ? free - StackMargin : free / 2;
+#else
 		stackLimit_ = FallbackStackLimit;
+#endif
 		body();
 	}
 	output_.flush();

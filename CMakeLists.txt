@@ -26,12 +26,16 @@ file(GLOB_RECURSE CORE_HEADERS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/in
 add_library(pseudocode_core STATIC ${CORE_SOURCES} ${CORE_HEADERS})
 target_include_directories(pseudocode_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-# The evaluator runs programs on a thread with a large stack.
-find_package(Threads REQUIRED)
-target_link_libraries(pseudocode_core PUBLIC Threads::Threads)
+if(EMSCRIPTEN)
+	include(wasm/Wasm.cmake)
+else()
+	# The evaluator runs programs on a thread with a large stack.
+	find_package(Threads REQUIRED)
+	target_link_libraries(pseudocode_core PUBLIC Threads::Threads)
 
-add_executable(${PROJECT_NAME} src/main.cpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE pseudocode_core)
+	add_executable(${PROJECT_NAME} src/main.cpp)
+	target_link_libraries(${PROJECT_NAME} PRIVATE pseudocode_core)
+endif()
 
 if(PSEUDOCODE_BUILD_TESTS)
 	enable_testing()

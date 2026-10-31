@@ -547,7 +547,7 @@ Bounds written in a parameter are evaluated when the call is made, before the su
 
 ### 8.4 Call stack and recursion
 
-Each call creates a fresh local scope, so recursion works without special handling. The default maximum call depth is 10,000, adjustable with `--max-depth`. Exceeding it is a runtime error (R011): *Too many nested calls (possible infinite recursion) in Factorial*. Programs run with a 512 MiB stack, and the interpreter also stops with R011 if the calls use up that stack, whatever `--max-depth` says.
+Each call creates a fresh local scope, so recursion works without special handling. The default maximum call depth is 10,000, adjustable with `--max-depth`. Exceeding it is a runtime error (R011): *Too many nested calls (possible infinite recursion) in Factorial*. Programs run with a 512 MiB stack, and the interpreter also stops with R011 if the calls use up that stack, whatever `--max-depth` says. In a web page the stack is smaller (12.5).
 
 Every runtime error prints the chain of active calls with line numbers. When there are more than 16 calls, only the innermost 8 and outermost 8 are shown, with a count of the rest.
 
@@ -840,6 +840,14 @@ PseudocodeInterpreter [options] [file]
 | `--help` | Print the options | — |
 
 With no file, `test.txt` in the current folder is used. Program output goes to standard output; errors and warnings go to standard error.
+
+### 12.5 WebAssembly
+
+The interpreter also compiles to WebAssembly (`wasm/README.md`). Run by Node.js through `build-wasm/pseudocode`, it behaves exactly as described here, and passes the same tests. In a web page, a program is run by `runPseudocode` in `wasm/pseudocode.mjs`, and three things differ:
+
+- All of the program's input is given before it runs. Running out of it is R014, as at the end of standard input.
+- Files are held in memory for the one run. Each run starts afresh.
+- A page cannot enlarge the browser's stack, so calls nest only about 1,000 to 1,500 deep, whatever `--max-depth` says. Going deeper is R011 (8.4), reported without a line or call chain.
 
 ## 13. Decisions, assumptions and open items
 

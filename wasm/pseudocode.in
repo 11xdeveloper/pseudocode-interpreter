@@ -1,0 +1,4 @@
+#!/bin/sh
+# Runs the interpreter compiled to WebAssembly, with the same options as the
+# native one: pseudocode [options] [file]
+exec "@PSEUDOCODE_NODE@" "@PSEUDOCODE_WASM_CLI@" "$@"

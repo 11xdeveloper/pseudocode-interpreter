@@ -63,3 +63,13 @@ ctest --test-dir build-asan
 ```
 
 The recursion-limit test uses `--max-depth 500`: AddressSanitizer cannot unwind an error through the default 10,000 nested calls.
+
+## WebAssembly
+
+The same tests run against the WebAssembly build, with a native build's `program_tests` (see `wasm/README.md`):
+
+```
+emcmake cmake -S . -B build-wasm -DPSEUDOCODE_TEST_RUNNER=$PWD/build/tests/program_tests
+cmake --build build-wasm
+ctest --test-dir build-wasm
+```
