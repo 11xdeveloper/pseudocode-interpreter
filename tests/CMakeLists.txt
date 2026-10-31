@@ -52,3 +52,45 @@ foreach(program ${PROGRAM_TESTS})
 	add_test(NAME program/${name} COMMAND ${runner} --interpreter ${interpreter} "${program}")
 	set_tests_properties(program/${name} PROPERTIES TIMEOUT 60)
 endforeach()
+
+# ---------- package tests: the packed npm package, installed as a user would ----------
+# WebAssembly build only, and off by default: they install their tools from
+# npm (tests/package/package-lock.json) and need Playwright's Chromium:
+#   emcmake cmake -S . -B build-wasm -DPSEUDOCODE_TEST_RUNNER=... -DPSEUDOCODE_PACKAGE_TESTS=ON
+#   (cd tests/package && npm ci && npx playwright install chromium)   once, for the browser
+#   ctest --test-dir build-wasm -L package
+
+if(EMSCRIPTEN AND TARGET npm_package)
+	option(PSEUDOCODE_PACKAGE_TESTS "Test the npm package (installs test tools from npm)" OFF)
+endif()
+if(PSEUDOCODE_PACKAGE_TESTS AND TARGET npm_package)
+	set(package_dir "${CMAKE_CURRENT_SOURCE_DIR}/package")
+	set(package_work "${CMAKE_CURRENT_BINARY_DIR}/package")
+	set(package_node "${PSEUDOCODE_NODE}")
+
+	add_test(NAME package/install
+		COMMAND ${package_node} "${package_dir}/install.mjs" "${PSEUDOCODE_NPM_TARBALL}" "${package_work}")
+	set_tests_properties(package/install PROPERTIES FIXTURES_SETUP npm_package TIMEOUT 600)
+
+	add_test(NAME package/node COMMAND ${package_node} --test node.test.mjs WORKING_DIRECTORY "${package_work}")
+	add_test(NAME package/types
+		COMMAND ${package_node} node_modules/typescript/bin/tsc -p . WORKING_DIRECTORY "${package_work}")
+	add_test(NAME package/bundle
+		COMMAND ${package_node} node_modules/vite/bin/vite.js build WORKING_DIRECTORY "${package_work}")
+	set_tests_properties(package/bundle PROPERTIES FIXTURES_SETUP npm_bundle)
+	add_test(NAME package/browser
+		COMMAND ${package_node} browser.mjs "${PROGRAMS_DIR}" "${PROJECT_BINARY_DIR}" WORKING_DIRECTORY "${package_work}")
+	set_tests_properties(package/browser PROPERTIES FIXTURES_REQUIRED "npm_package;npm_bundle" TIMEOUT 300)
+	set(package_tests package/node package/types package/bundle)
+
+	# The program tests again, through the installed `pseudocode` command.
+	if(runner AND NOT WIN32)
+		add_test(NAME package/programs
+			COMMAND ${runner} --interpreter "${package_work}/node_modules/.bin/pseudocode" "${PROGRAMS_DIR}")
+		set_tests_properties(package/programs PROPERTIES TIMEOUT 300)
+		list(APPEND package_tests package/programs)
+	endif()
+
+	set_tests_properties(${package_tests} PROPERTIES FIXTURES_REQUIRED npm_package)
+	set_tests_properties(package/install package/browser ${package_tests} PROPERTIES LABELS package)
+endif()

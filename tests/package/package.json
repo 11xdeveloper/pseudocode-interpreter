@@ -1,0 +1,10 @@
+{
+	"private": true,
+	"description": "Tools for testing the packed npm package (see tests/README.md)",
+	"type": "module",
+	"devDependencies": {
+		"playwright": "1.63.0",
+		"typescript": "7.0.2",
+		"vite": "8.3.5"
+	}
+}

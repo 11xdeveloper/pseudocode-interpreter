@@ -73,3 +73,28 @@ emcmake cmake -S . -B build-wasm -DPSEUDOCODE_TEST_RUNNER=$PWD/build/tests/progr
 cmake --build build-wasm
 ctest --test-dir build-wasm
 ```
+
+## The npm package (`package/`)
+
+These test the packed npm package, installed from its `.tgz` into a fresh folder as a user would install it, so they use exactly the files `npm publish` would upload. They need the WebAssembly build, and are off by default: they install their tools from npm (`package/package-lock.json`) and need Playwright's Chromium. Once:
+
+```
+(cd tests/package && npm ci && npx playwright install chromium)
+```
+
+then:
+
+```
+emcmake cmake -S . -B build-wasm -DPSEUDOCODE_TEST_RUNNER=$PWD/build/tests/program_tests -DPSEUDOCODE_PACKAGE_TESTS=ON
+cmake --build build-wasm
+ctest --test-dir build-wasm -L package
+```
+
+- `package/install` sets up `build-wasm/tests/package`: the tools, then the package.
+- `package/node` (`node.test.mjs`): the library in Node.js, imported by its name, and the `pseudocode` command.
+- `package/programs`: every program test, through the installed `pseudocode` command.
+- `package/types` (`types.ts`): the TypeScript types, checked by `tsc`, including that wrong uses are errors.
+- `package/bundle`: builds `app/` with Vite, which must copy the `.wasm` file into the build.
+- `package/browser` (`browser.mjs`): in Chromium, every program test through `runPseudocode`, compared exactly with its `.expected` file; the package from a Web Worker; what only a page does (input up front, files in memory, shallower recursion); the Vite-built app; and `example.html`. `language/recursion` nests deeper than a page's stack allows, so in a page it is expected to stop with R011.
+
+CI also runs `node.test.mjs` against the package on each supported Node.js version.
