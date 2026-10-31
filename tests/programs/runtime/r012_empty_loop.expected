@@ -1,0 +1,7 @@
+exit: 2
+--- stdout
+Before
+--- stderr
+r012_empty_loop.pseudo:4:1: Runtime error R012: The program was stopped after 50 steps (--max-steps). It may be stuck in a loop that never ends
+   WHILE TRUE DO
+   ^

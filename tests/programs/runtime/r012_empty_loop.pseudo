@@ -1,0 +1,5 @@
+// ARGS: --max-steps 50
+// R012: each time round a loop is a step, so an empty loop still stops (spec 7.8).
+OUTPUT "Before"
+WHILE TRUE DO
+ENDWHILE

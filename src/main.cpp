@@ -59,7 +59,7 @@ constexpr const char* Usage =
 	"\n"
 	"  --strict        every variable must be declared\n"
 	"  --defaults      variables start as 0, 0.0, \"\", FALSE and so on\n"
-	"  --max-steps N   stop after N statements (catches endless loops)\n"
+	"  --max-steps N   stop after N steps (catches endless loops)\n"
 	"  --max-depth N   allow calls to nest N deep (default 10000)\n"
 	"  --seed N        make RAND give the same numbers on every run\n"
 	"  --tokens        print the tokens instead of running\n"

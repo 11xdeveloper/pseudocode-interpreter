@@ -484,7 +484,7 @@ The BOOLEAN condition is tested before each pass; the loop ends when it is `FALS
 
 ### 7.8 Infinite-loop guard
 
-The interpreter offers `--max-steps N`, which stops with runtime error R012 after N statements execute. Every statement counts each time it runs, including the IF, CASE and loop statements themselves. This is meant for automated marking and classroom use, where a missing increment otherwise hangs the run.
+The interpreter offers `--max-steps N`, which stops with runtime error R012 after N steps. Every statement is a step each time it runs, including the IF, CASE and loop statements themselves, and so is each time round a loop, so a loop with an empty body (`WHILE TRUE DO ENDWHILE`) still stops. This is meant for automated marking and classroom use, where a missing increment otherwise hangs the run.
 
 ## 8. Procedures and functions
 
@@ -833,7 +833,7 @@ PseudocodeInterpreter [options] [file]
 | --- | --- | --- |
 | `--strict` | Every variable must be declared | 5.1 |
 | `--defaults` | Variables start with their type's starting value | 5.1 |
-| `--max-steps N` | Stop with R012 after N statements | 7.8 |
+| `--max-steps N` | Stop with R012 after N steps | 7.8 |
 | `--max-depth N` | Allow calls to nest N deep (default 10,000) | 8.4 |
 | `--seed N` | Make `RAND` give the same numbers on every run | 9.2 |
 | `--tokens`, `--ast`, `--types` | Print the tokens, the syntax tree or the defined types instead of running | — |

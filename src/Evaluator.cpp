@@ -186,14 +186,20 @@ const Type* Evaluator::resolveType(const TypeSpec& spec) {
 Evaluator::Flow Evaluator::execute(const Stmt& stmt) {
 	environment_.setCurrentLine(stmt.location.line);
 	try {
-		if (options_.maxSteps > 0 && ++steps_ > options_.maxSteps) {
-			throw RuntimeError("R012", "The program was stopped after " + std::to_string(options_.maxSteps)
-				+ " statements (--max-steps). It may be stuck in a loop that never ends");
-		}
+		countStep();
 		return executeNode(stmt);
 	}
 	catch (const RuntimeError& error) {
 		throw located(error, stmt.location);
+	}
+}
+
+// Spec 7.8: every statement counts towards --max-steps, and so does each
+// time round a loop, so that a loop with an empty body still stops.
+void Evaluator::countStep() {
+	if (options_.maxSteps > 0 && ++steps_ > options_.maxSteps) {
+		throw RuntimeError("R012", "The program was stopped after " + std::to_string(options_.maxSteps)
+			+ " steps (--max-steps). It may be stuck in a loop that never ends");
 	}
 }
 
@@ -229,12 +235,14 @@ Evaluator::Flow Evaluator::executeNode(const Stmt& stmt) {
 		[&](const RepeatStmt& node) {
 			// Spec 7.6: the body runs at least once.
 			do {
+				countStep();
 				if (executeBlock(node.body) == Flow::Return) return Flow::Return;
 			} while (!condition(*node.condition, "The UNTIL condition"));
 			return Flow::Normal;
 		},
 		[&](const WhileStmt& node) {
 			while (condition(*node.condition, "The WHILE condition")) {
+				countStep();
 				if (executeBlock(node.body) == Flow::Return) return Flow::Return;
 			}
 			return Flow::Normal;
@@ -364,6 +372,7 @@ Evaluator::Flow Evaluator::executeFor(const ForStmt& node) {
 
 	storeValue(*cell, value);
 	while (step > 0 ? value <= end : value >= end) {
+		countStep();
 		if (executeBlock(node.body) == Flow::Return) {
 			return Flow::Return;
 		}

@@ -73,6 +73,7 @@ private:
 
 	// Statements
 	Flow execute(const Stmt& stmt);
+	void countStep();
 	Flow executeBlock(const Block& block);
 	Flow executeNode(const Stmt& stmt);
 	void executeAssign(const AssignStmt& node);
