@@ -186,6 +186,7 @@ try {
 			noInput: await runPseudocode('DECLARE A : STRING\nINPUT A\nINPUT A\n'),
 			kept: (await runPseudocode('OPENFILE "Keep.txt" FOR WRITE\nCLOSEFILE "Keep.txt"\n')).files,
 			fresh: await runPseudocode('OPENFILE "Keep.txt" FOR READ\n'),
+			limited: await runPseudocode('OUTPUT "Hello"\nOUTPUT "World"\n', { maxOutput: 8 }),
 		};
 	});
 	check('worker runs a program with input', page2.workerHello.stdout === 'Hi Bo\n', JSON.stringify(page2.workerHello));
@@ -199,6 +200,10 @@ try {
 		page2.noInput.exitCode === 2 && /R014/.test(page2.noInput.stderr), JSON.stringify(page2.noInput));
 	check('files do not carry over between runs',
 		'Keep.txt' in page2.kept && page2.fresh.exitCode === 2 && /R010/.test(page2.fresh.stderr), JSON.stringify(page2.fresh));
+
+	check('output over maxOutput stops with R015',
+		page2.limited.exitCode === 2 && page2.limited.stdout === 'Hello\nWo' && /R015/.test(page2.limited.stderr),
+		JSON.stringify(page2.limited));
 
 	// 4. The app Vite built, importing the package by name.
 	await page.goto(`${origin}/dist/`);

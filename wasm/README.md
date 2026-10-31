@@ -30,6 +30,7 @@ const result = await runPseudocode(source, {
 	input: 'Ada\n',                      // all of the program's input, given up front
 	args: ['--max-steps', '1000000'],    // any of the command line options
 	files: { 'Scores.txt': '12\n15\n' }, // files for the program to read
+	maxOutput: 1024 * 1024,              // stop with R015 after this many bytes of output (default 64 MiB)
 });
 result.exitCode; // 0, 1 for errors found before running, 2 for runtime errors
 result.stdout;   // the program's output
@@ -45,11 +46,12 @@ python3 -m http.server -d build-wasm 8000
 
 and open http://localhost:8000/example.html.
 
-In a page, the interpreter differs from the native one in three ways:
+In a page, the interpreter differs from the native one in four ways:
 
 - **Input is given up front.** `INPUT` reads from `input`; once that runs out, `INPUT` stops with R014, as it does at the end of standard input.
 - **Files are in memory** and last for one run. Each run starts with a fresh interpreter, so nothing carries over from one run to the next.
 - **Recursion is shallower.** A page cannot enlarge the browser's stack, so calls can nest only about 1,000 to 1,500 deep, depending on the browser. Going deeper is R011, but without the line and call chain, since the browser stops the interpreter before its own check does.
+- **Output is limited**, to 64 MiB unless `maxOutput` says otherwise. A program that outputs more stops with R015, and `stdout` keeps its output up to the limit.
 
 A run blocks the thread it is on until the program ends, so a real page should call `runPseudocode` from a worker. The example page passes `--max-steps` instead, so an endless loop stops with an error rather than hanging the page.
 

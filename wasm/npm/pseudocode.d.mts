@@ -12,6 +12,12 @@ export interface RunOptions {
 	files?: Record<string, string>;
 	/** The program's file name, used in error messages. Defaults to `program.pseudo`. */
 	fileName?: string;
+	/**
+	 * The most the program may output, in bytes. A program that outputs more
+	 * is stopped with runtime error R015, and `stdout` holds the output up to
+	 * the limit. Defaults to 64 MiB (67,108,864 bytes).
+	 */
+	maxOutput?: number;
 }
 
 export interface RunResult {

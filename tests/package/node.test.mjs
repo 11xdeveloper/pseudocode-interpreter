@@ -5,7 +5,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { closeSync, existsSync, mkdtempSync, openSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -102,6 +102,48 @@ test('runs are independent, even side by side', async () => {
 	assert.deepEqual(results.map(r => r.stdout), ['55\n', '210\n', '465\n', '820\n']);
 });
 
+// Outputs a 16 MiB line `times` times, then "END".
+const bigOutput = times => `DECLARE S : STRING
+DECLARE I : INTEGER
+S ← "x"
+FOR I ← 1 TO 24
+   S ← S & S
+NEXT I
+FOR I ← 1 TO ${times}
+   OUTPUT S
+NEXT I
+OUTPUT "END"
+`;
+const bigOutputLength = times => times * (2 ** 24 + 1) + 'END\n'.length;
+
+test('large output comes back whole', async () => {
+	// Over 112,813,858 bytes, where output kept in a JavaScript array used to
+	// stop growing, silently, with exit status 0.
+	const result = await runPseudocode(bigOutput(9), { maxOutput: 200e6 });
+	assert.equal(result.exitCode, 0, result.stderr);
+	assert.equal(result.stdout.length, bigOutputLength(9));
+	assert.ok(result.stdout.endsWith('xx\nEND\n'));
+});
+
+test('output over maxOutput stops the program with R015', async () => {
+	const limited = await runPseudocode('OUTPUT "Hello"\nOUTPUT "World"\nOUTPUT "Again"\n', { maxOutput: 10 });
+	assert.equal(limited.exitCode, 2);
+	assert.equal(limited.stdout, 'Hello\nWorl');
+	assert.match(limited.stderr, /^program\.pseudo:2:1: Runtime error R015: /);
+	assert.match(limited.stderr, /over the limit of 10 bytes \(the maxOutput option\)/);
+
+	const exact = await runPseudocode('OUTPUT "Hello"\nOUTPUT "World"\n', { maxOutput: 12 });
+	assert.deepEqual([exact.exitCode, exact.stdout], [0, 'Hello\nWorld\n']);
+
+	const byDefault = await runPseudocode(bigOutput(5));
+	assert.equal(byDefault.exitCode, 2);
+	assert.equal(byDefault.stdout.length, 64 * 1024 * 1024);
+	assert.match(byDefault.stderr, /R015[^]*over the limit of 67108864 bytes/);
+
+	await assert.rejects(runPseudocode('OUTPUT 1\n', { maxOutput: '10' }), TypeError);
+	await assert.rejects(runPseudocode('OUTPUT 1\n', { maxOutput: -1 }), TypeError);
+});
+
 test('UTF-8 text in and out', async () => {
 	const result = await runPseudocode('DECLARE S : STRING\nINPUT S\nOUTPUT "→ ", S\n', { input: 'café ✓\n' });
 	assert.equal(result.stdout, '→ café ✓\n');
@@ -153,6 +195,20 @@ test('the command recurses as deeply as the native interpreter', () => {
 	const stopped = pseudocode([endless.path]);
 	assert.equal(stopped.status, 2);
 	assert.match(stopped.stderr, /R011.*\n.*\n.*\n\s+in function F \(line 3\)/);
+});
+
+test('the command stops with R015 when its output cannot be written', { skip: !existsSync('/dev/full') }, () => {
+	const { path } = programFile('Full.pseudo', 'OUTPUT "Hello"\n');
+	const full = openSync('/dev/full', 'w');
+	try {
+		const bin = join(here, 'node_modules', '.bin', 'pseudocode');
+		const result = spawnSync(bin, [path], { stdio: ['ignore', full, 'pipe'], encoding: 'utf8' });
+		assert.equal(result.status, 2);
+		assert.match(result.stderr, /Runtime error R015/);
+	}
+	finally {
+		closeSync(full);
+	}
 });
 
 test('the command reports its exit status', () => {

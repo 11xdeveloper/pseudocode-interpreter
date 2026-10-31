@@ -8,6 +8,7 @@ const options: RunOptions = {
 	args: ['--seed', '42'],
 	files: { 'Scores.txt': '12\n15\n' },
 	fileName: 'Hello.pseudo',
+	maxOutput: 1024 * 1024,
 };
 const result: RunResult = await runPseudocode('OUTPUT "Hello"', options);
 const exitCode: number = result.exitCode;
@@ -21,6 +22,8 @@ await runPseudocode();
 await runPseudocode('OUTPUT 1', { args: '--strict' });
 // @ts-expect-error files hold text
 await runPseudocode('OUTPUT 1', { files: { 'A.txt': 42 } });
+// @ts-expect-error maxOutput is a number of bytes
+await runPseudocode('OUTPUT 1', { maxOutput: '1 MB' });
 // @ts-expect-error there is no such option
 await runPseudocode('OUTPUT 1', { stdin: '' });
 // @ts-expect-error exitCode is a number

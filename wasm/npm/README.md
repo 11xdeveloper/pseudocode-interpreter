@@ -21,6 +21,7 @@ OUTPUT "Hello, ", Name
 	input: 'Ada\n',                      // all of the program's input, given up front
 	args: ['--max-steps', '1000000'],    // any of the command line options
 	files: { 'Scores.txt': '12\n15\n' }, // files for the program to read
+	maxOutput: 1024 * 1024,              // stop with R015 after this many bytes of output (default 64 MiB)
 });
 
 result.exitCode; // 0, 1 for errors found before running, 2 for runtime errors
@@ -31,7 +32,7 @@ result.files;    // { name: text }: the files in the program's folder afterwards
 
 Each call runs the program in a fresh interpreter, so nothing carries over from one run to the next. TypeScript types are included.
 
-The options are the same as on the command line (below). `--max-steps` is worth passing whenever the program comes from a user, so that an endless loop stops with an error instead of running for ever.
+The `args` are the same as on the command line (below). `--max-steps` is worth passing whenever the program comes from a user, so that an endless loop stops with an error instead of running for ever. `maxOutput` limits the output: a program that outputs more is stopped with runtime error R015, and `stdout` holds its output up to the limit.
 
 ### In a web page
 
@@ -46,11 +47,12 @@ import { runPseudocode } from 'pseudocode-interpreter';
 onmessage = async ({ data }) => postMessage(await runPseudocode(data.source, data.options));
 ```
 
-In a page, the interpreter differs from the command line in three ways:
+In a page, the interpreter differs from the command line in four ways:
 
 - **Input is given up front.** `INPUT` reads from `input`; once that runs out, `INPUT` stops with R014, as it does at the end of standard input.
 - **Files are in memory** and last for one run. Pass them in with `files` and read what the program wrote from `result.files`.
 - **Recursion is shallower.** A page cannot enlarge the browser's stack, so calls can nest only about 1,000 to 1,500 deep, depending on the browser. Going deeper is R011, reported without the line and call chain.
+- **Output is limited**, to 64 MiB unless `maxOutput` says otherwise. A program that outputs more stops with R015, and `stdout` keeps its output up to the limit.
 
 ## On the command line
 

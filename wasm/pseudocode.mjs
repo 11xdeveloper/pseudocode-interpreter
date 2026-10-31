@@ -13,16 +13,61 @@
 // fresh interpreter, so nothing carries over from one run to the next.
 // A run blocks the thread it is on until the program ends, so a page should
 // run programs in a worker, or pass --max-steps to stop endless loops.
+// `maxOutput` limits the program's output, in bytes: a program that outputs
+// more is stopped with runtime error R015.
 
 import createInterpreter from './pseudocode-core.mjs';
 
 const Folder = '/program';
+const DefaultMaxOutput = 64 * 1024 * 1024;
 
-export async function runPseudocode(source, { input = '', args = [], files = {}, fileName = 'program.pseudo' } = {}) {
+// A stream's bytes, one byte each. (A JavaScript array of bytes takes eight
+// times the memory, and stops growing at about 112 million elements.)
+// Pushing past the limit throws, and so does running out of memory, which
+// the interpreter sees as a failed write: it stops with R015 rather than
+// carrying on without its output.
+class Bytes {
+	constructor(limit = Infinity) {
+		this.limit = limit;
+		this.overLimit = false;
+		this.data = new Uint8Array(4096);
+		this.length = 0;
+	}
+
+	push(byte) {
+		if (this.length >= this.limit) {
+			this.overLimit = true;
+			throw new RangeError('Output limit reached');
+		}
+		if (this.length === this.data.length) {
+			const grown = new Uint8Array(Math.min(this.data.length * 2, Math.max(this.limit, this.data.length + 1)));
+			grown.set(this.data);
+			this.data = grown;
+		}
+		this.data[this.length++] = byte;
+	}
+
+	append(text) {
+		for (const byte of new TextEncoder().encode(text)) {
+			this.push(byte);
+		}
+	}
+
+	text() {
+		return new TextDecoder().decode(this.data.subarray(0, this.length));
+	}
+}
+
+export async function runPseudocode(source, {
+	input = '', args = [], files = {}, fileName = 'program.pseudo', maxOutput = DefaultMaxOutput,
+} = {}) {
+	if (typeof maxOutput !== 'number' || !(maxOutput >= 0)) {
+		throw new TypeError(`maxOutput must be a number of bytes, 0 or more, not ${typeof maxOutput === 'string' ? `"${maxOutput}"` : maxOutput}`);
+	}
 	const inputBytes = new TextEncoder().encode(input);
 	let inputPosition = 0;
-	const stdout = [];
-	const stderr = [];
+	const stdout = new Bytes(maxOutput);
+	const stderr = new Bytes();
 	const interpreter = await createInterpreter({
 		stdin: () => (inputPosition < inputBytes.length ? inputBytes[inputPosition++] : null),
 		stdout: byte => byte !== null && stdout.push(byte),
@@ -49,9 +94,11 @@ export async function runPseudocode(source, { input = '', args = [], files = {},
 		if (!(error instanceof RangeError || error?.name === 'InternalError')) {
 			throw error;
 		}
-		const message = `${fileName}: Runtime error R011: Too many nested calls (possible infinite recursion)\n`;
-		stderr.push(...new TextEncoder().encode(message));
+		stderr.append(`${fileName}: Runtime error R011: Too many nested calls (possible infinite recursion)\n`);
 		exitCode = 2;
+	}
+	if (stdout.overLimit) {
+		stderr.append(`The program's output was over the limit of ${maxOutput} bytes (the maxOutput option).\n`);
 	}
 
 	const after = {};
@@ -60,11 +107,5 @@ export async function runPseudocode(source, { input = '', args = [], files = {},
 			after[name] = FS.readFile(name, { encoding: 'utf8' });
 		}
 	}
-	const decoder = new TextDecoder();
-	return {
-		exitCode,
-		stdout: decoder.decode(new Uint8Array(stdout)),
-		stderr: decoder.decode(new Uint8Array(stderr)),
-		files: after,
-	};
+	return { exitCode, stdout: stdout.text(), stderr: stderr.text(), files: after };
 }

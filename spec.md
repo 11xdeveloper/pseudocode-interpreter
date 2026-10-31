@@ -848,6 +848,7 @@ The interpreter also compiles to WebAssembly (`wasm/README.md`). Run by Node.js 
 
 - All of the program's input is given before it runs. Running out of it is R014, as at the end of standard input.
 - Files are held in memory for the one run. Each run starts afresh.
+- Output is limited by the `maxOutput` option, 64 MiB unless it says otherwise. Going over it is R015: the program stops, and its output up to the limit is kept.
 - A page cannot enlarge the browser's stack, so calls nest only about 1,000 to 1,500 deep, whatever `--max-depth` says. Going deeper is R011 (8.4), reported without a line or call chain.
 
 ## 13. Decisions, assumptions and open items
