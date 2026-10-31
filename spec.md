@@ -844,7 +844,7 @@ With no file, `test.txt` in the current folder is used. Program output goes to s
 
 ### 12.5 WebAssembly
 
-The interpreter also compiles to WebAssembly (`wasm/README.md`). Run by Node.js through `build-wasm/pseudocode`, it behaves exactly as described here, and passes the same tests. In a web page, a program is run by `runPseudocode` in `wasm/pseudocode.mjs`, and three things differ:
+The interpreter also compiles to WebAssembly (`wasm/README.md`). Run by Node.js through `build-wasm/pseudocode`, it behaves exactly as described here, and passes the same tests. In a web page, a program is run by `runPseudocode` in `wasm/pseudocode.mjs`, and four things differ:
 
 - All of the program's input is given before it runs. Running out of it is R014, as at the end of standard input.
 - Files are held in memory for the one run. Each run starts afresh.
