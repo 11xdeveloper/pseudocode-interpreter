@@ -399,7 +399,7 @@ Higher rows bind tighter. All binary operators are left-associative except compa
 
 ### 7.2 INPUT and OUTPUT
 
-**OUTPUT** evaluates each expression left to right, converts it using the formats in 4.1, writes them with **no separator**, then writes a newline. An enumerated value is written as its name. Arrays, records, sets, objects and pointers cannot be output (M004 where known before running, R002 otherwise).
+**OUTPUT** evaluates each expression left to right, converts it using the formats in 4.1, writes them with **no separator**, then writes a newline. An enumerated value is written as its name. Arrays, records, sets, objects and pointers cannot be output (M004 where known before running, R002 otherwise). If the output cannot be written, as with a full disk or a closed pipe, the program stops with runtime error R015 rather than carrying on without it; output is buffered, so this may be noticed at a later OUTPUT, or when the program ends.
 
 ```
 OUTPUT "You have ", Lives, " lives left"
@@ -809,6 +809,7 @@ Messages SHOULD be written for students: plain English, naming the identifier in
 | R012 | Runtime | Step limit exceeded (`--max-steps`) |
 | R013 | Runtime | FOR loop STEP is zero |
 | R014 | Runtime | End of input reached during INPUT |
+| R015 | Runtime | Output could not be written (full disk, closed pipe, or over `runPseudocode`'s `maxOutput` limit, 12.5) |
 
 ### 12.3 Warnings
 

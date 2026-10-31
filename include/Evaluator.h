@@ -130,6 +130,7 @@ private:
 	std::uintptr_t stackBase_ = 0; // stack position when the program started
 	size_t stackLimit_ = 0;         // stack bytes a program may use before R011
 	Value returnValue_; // set by RETURN, taken by the function call
+	SourceLocation lastOutput_;     // the OUTPUT that ran last, for R015 at the final flush
 	std::map<const TypeSpec*, const Type*> resolvedTypes_;
 	std::vector<Diagnostic> warnings_;
 };

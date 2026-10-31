@@ -25,7 +25,7 @@ Each suite (`operations`, `values`, `types`, `environment`, `builtins`) is one c
 
 ## Program tests (`programs/`)
 
-Each `NAME.pseudo` is a whole program, run by the interpreter and compared exactly with `NAME.expected`: the exit status, standard output and standard error. They are grouped by what they test: `lexical`, `syntax`, `semantic`, `runtime` and `warnings` cover every error and warning code in spec section 12; `language`, `builtins` and `files` cover what programs can do.
+Each `NAME.pseudo` is a whole program, run by the interpreter and compared exactly with `NAME.expected`: the exit status, standard output and standard error. They are grouped by what they test: `lexical`, `syntax`, `semantic`, `runtime` and `warnings` cover every error and warning code in spec section 12 except R015, which needs output that cannot be written (see Output errors below); `language`, `builtins` and `files` cover what programs can do.
 
 Comment lines at the top of a program control how it runs:
 
@@ -51,6 +51,10 @@ git diff tests/programs
 ```
 
 `--keep` leaves each program's temporary folder in place and prints where it is, to look at the files it wrote.
+
+## Output errors (`output/`)
+
+R015, for output that cannot be written, needs a failing output stream, which a program test cannot arrange. `output/final_flush` and `output/many_lines` run the interpreter with its output going to `/dev/full`, where every write fails, and expect R015 and exit status 2: once when the failure only shows at the final flush, and once part way through. They run on Linux, in the native and WebAssembly builds.
 
 ## Sanitizers
 

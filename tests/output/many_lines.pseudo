@@ -1,0 +1,6 @@
+// Fails part way through, at whichever OUTPUT first fills the buffer.
+DECLARE I : INTEGER
+FOR I ← 1 TO 100000
+   OUTPUT "Line ", I
+NEXT I
+OUTPUT "Never reached"

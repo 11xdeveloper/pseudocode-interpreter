@@ -1,0 +1,4 @@
+// Short enough to stay in the output buffer until the program ends, so the
+// failure only shows when the buffer is flushed at the end.
+OUTPUT "Hello"
+OUTPUT "World"

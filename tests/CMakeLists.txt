@@ -53,6 +53,21 @@ foreach(program ${PROGRAM_TESTS})
 	set_tests_properties(program/${name} PROPERTIES TIMEOUT 60)
 endforeach()
 
+# ---------- output errors: R015 when output cannot be written ----------
+# Writing to /dev/full always fails ("no space left on device"), which a
+# program test cannot arrange, so these run the interpreter themselves.
+
+if(EXISTS /dev/full AND NOT WIN32)
+	foreach(program final_flush many_lines)
+		add_test(NAME output/${program}
+			COMMAND sh -c "\"$0\" \"$1\" > /dev/full; echo \"exit status $?\""
+				${interpreter} "${CMAKE_CURRENT_SOURCE_DIR}/output/${program}.pseudo")
+		set_tests_properties(output/${program} PROPERTIES
+			PASS_REGULAR_EXPRESSION "Runtime error R015: The program's output could not be written.*exit status 2"
+			TIMEOUT 60)
+	endforeach()
+endif()
+
 # ---------- package tests: the packed npm package, installed as a user would ----------
 # WebAssembly build only, and off by default: they install their tools from
 # npm (tests/package/package-lock.json) and need Playwright's Chromium:

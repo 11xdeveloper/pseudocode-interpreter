@@ -21,6 +21,11 @@
 
 namespace {
 
+// Spec 12.2: R015, when the program's output cannot be written, as with a
+// full disk, a closed pipe, or runPseudocode's maxOutput limit. Otherwise
+// the program would carry on and end "successfully" without its output.
+constexpr const char* OutputFailed = "The program's output could not be written, so the program was stopped";
+
 // A runtime error's call chain is cut to this many calls at each end, so
 // runaway recursion does not print thousands of lines.
 constexpr size_t ChainEnds = 8;
@@ -128,9 +133,13 @@ std::optional<Diagnostic> Evaluator::run() {
 #endif
 		body();
 	}
+	// Output still buffered is written now, and that can fail too.
 	output_.flush();
 	if (failure) {
 		std::rethrow_exception(failure);
+	}
+	if (!output_ && !result) {
+		result = located(RuntimeError("R015", OutputFailed), lastOutput_).diagnostic;
 	}
 	return result;
 }
@@ -213,7 +222,11 @@ Evaluator::Flow Evaluator::execute(const Stmt& stmt) {
 	environment_.setCurrentLine(stmt.location.line);
 	try {
 		countStep();
-		return executeNode(stmt);
+		Flow flow = executeNode(stmt);
+		if (std::holds_alternative<OutputStmt>(stmt.node)) {
+			lastOutput_ = stmt.location;
+		}
+		return flow;
 	}
 	catch (const RuntimeError& error) {
 		throw located(error, stmt.location);
@@ -295,6 +308,9 @@ void Evaluator::executeAssign(const AssignStmt& node) {
 void Evaluator::executeInput(const InputStmt& node) {
 	Place target = requirePlace(*node.target, true);
 	output_.flush(); // so a prompt written by OUTPUT is visible first
+	if (!output_) {
+		throw RuntimeError("R015", OutputFailed);
+	}
 	std::string line;
 	if (!std::getline(input_, line)) {
 		throw RuntimeError("R014", "End of input reached while INPUT was waiting for a value for " + target.text);
@@ -323,6 +339,11 @@ void Evaluator::executeOutput(const OutputStmt& node) {
 		}
 	}
 	output_ << line << '\n';
+	// The stream fails when a write does, which buffering can delay until
+	// a later OUTPUT; once failed, it stays failed.
+	if (!output_) {
+		throw RuntimeError("R015", OutputFailed);
+	}
 }
 
 void Evaluator::executeCall(const CallStmt& node) {
