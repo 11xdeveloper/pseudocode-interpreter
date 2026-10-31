@@ -33,7 +33,11 @@ target_link_options(${PROJECT_NAME} PRIVATE ${PSEUDOCODE_NODE_LINK_OPTIONS})
 list(GET CMAKE_CROSSCOMPILING_EMULATOR 0 PSEUDOCODE_NODE)
 set(PSEUDOCODE_WASM_CLI "${CMAKE_CURRENT_BINARY_DIR}/pseudocode-cli.mjs")
 configure_file(wasm/cli.mjs pseudocode-cli.mjs COPYONLY)
-configure_file(wasm/pseudocode.in pseudocode @ONLY)
+# configure_file keeps the template's permissions, and a fresh clone may not
+# have it executable, so the launcher is copied into place as executable.
+configure_file(wasm/pseudocode.in CMakeFiles/pseudocode @ONLY)
+file(COPY "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/pseudocode" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}"
+	FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
 # For web pages: an ES module whose files are in memory. A page cannot set
 # the engine's stack, which runs out first (see wasm/pseudocode.mjs), so a
