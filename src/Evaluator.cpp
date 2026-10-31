@@ -80,6 +80,19 @@ bool runOnLargeStack(std::function<void()>& body) {
 }
 #endif
 
+// Where the stack is now, to measure how much the program's calls use. The
+// frame address is always on the real stack; the address of a local is not
+// under AddressSanitizer, which can move locals to a separate "fake stack"
+// to catch uses after return, making calls look far deeper than they are.
+std::uintptr_t stackPosition() {
+#if defined(__GNUC__) || defined(__clang__)
+	return reinterpret_cast<std::uintptr_t>(__builtin_frame_address(0));
+#else
+	char marker = 0;
+	return reinterpret_cast<std::uintptr_t>(&marker);
+#endif
+}
+
 Value literalValue(const Literal& literal) {
 	return std::visit([](const auto& value) -> Value { return value; }, literal);
 }
@@ -123,8 +136,7 @@ std::optional<Diagnostic> Evaluator::run() {
 }
 
 std::optional<Diagnostic> Evaluator::runStatements() {
-	char marker = 0;
-	stackBase_ = reinterpret_cast<std::uintptr_t>(&marker);
+	stackBase_ = stackPosition();
 	try {
 		for (const StmtPtr& stmt : program_.statements) {
 			execute(*stmt);
@@ -761,8 +773,7 @@ Value Evaluator::invoke(const Callable& callable, const std::vector<ExprPtr>& ar
 	}
 	const Subroutine& subroutine = *callable.subroutine;
 
-	char marker = 0;
-	std::uintptr_t position = reinterpret_cast<std::uintptr_t>(&marker);
+	std::uintptr_t position = stackPosition();
 	if ((stackBase_ > position ? stackBase_ - position : position - stackBase_) > stackLimit_) {
 		throw RuntimeError("R011", "Too many nested calls (possible infinite recursion) in " + subroutine.name.name);
 	}
