@@ -54,3 +54,50 @@ target_link_options(pseudocode_web PRIVATE
 	-sSTACK_SIZE=16MB)
 configure_file(wasm/pseudocode.mjs pseudocode.mjs COPYONLY)
 configure_file(wasm/example.html example.html COPYONLY)
+
+# ---------- the npm package (see wasm/README.md) ----------
+# Both builds, the types, README and licence, staged in build-wasm/npm and
+# packed by npm into build-wasm/pseudocode-interpreter-VERSION.tgz, which
+# `npm publish` takes as it is.
+
+# The oldest Node.js the package works with, tested in .github/workflows/ci.yml.
+# Node.js 16 and 17 cannot load it: they lack WebAssembly exception handling.
+set(PSEUDOCODE_NODE_ENGINES ">=18")
+
+set(PSEUDOCODE_NPM_DIR "${CMAKE_CURRENT_BINARY_DIR}/npm")
+set(PSEUDOCODE_NPM_TARBALL "${CMAKE_CURRENT_BINARY_DIR}/pseudocode-interpreter-${PROJECT_VERSION}.tgz")
+configure_file(wasm/npm/package.json.in npm/package.json @ONLY)
+configure_file(wasm/npm/README.md npm/README.md @ONLY)
+configure_file(wasm/npm/pseudocode.d.mts npm/pseudocode.d.mts COPYONLY)
+configure_file(LICENSE npm/LICENSE COPYONLY)
+configure_file(wasm/pseudocode.mjs npm/pseudocode.mjs COPYONLY)
+configure_file(wasm/cli.mjs npm/cli.mjs COPYONLY)
+
+# npm sits beside Node.js in emsdk and in Node's own installers.
+get_filename_component(PSEUDOCODE_NODE_DIR "${PSEUDOCODE_NODE}" DIRECTORY)
+find_program(PSEUDOCODE_NPM NAMES npm npm.cmd HINTS "${PSEUDOCODE_NODE_DIR}")
+if(PSEUDOCODE_NPM)
+	# npm starts with #!/usr/bin/env node, so that Node.js must be on PATH.
+	set(PSEUDOCODE_NPM_COMMAND "${PSEUDOCODE_NPM}")
+	if(NOT WIN32)
+		set(PSEUDOCODE_NPM_COMMAND ${CMAKE_COMMAND} -E env "PATH=${PSEUDOCODE_NODE_DIR}:$ENV{PATH}" "${PSEUDOCODE_NPM}")
+	endif()
+	add_custom_command(OUTPUT "${PSEUDOCODE_NPM_TARBALL}"
+		COMMAND ${CMAKE_COMMAND} -E copy
+			$<TARGET_FILE:${PROJECT_NAME}>
+			$<TARGET_FILE_DIR:${PROJECT_NAME}>/${PROJECT_NAME}.wasm
+			$<TARGET_FILE:pseudocode_web>
+			$<TARGET_FILE_DIR:pseudocode_web>/pseudocode-core.wasm
+			"${PSEUDOCODE_NPM_DIR}"
+		COMMAND ${PSEUDOCODE_NPM_COMMAND} pack --silent --pack-destination "${CMAKE_CURRENT_BINARY_DIR}"
+		WORKING_DIRECTORY "${PSEUDOCODE_NPM_DIR}"
+		DEPENDS ${PROJECT_NAME} pseudocode_web
+			"${PSEUDOCODE_NPM_DIR}/package.json" "${PSEUDOCODE_NPM_DIR}/README.md"
+			"${PSEUDOCODE_NPM_DIR}/pseudocode.d.mts" "${PSEUDOCODE_NPM_DIR}/LICENSE"
+			"${PSEUDOCODE_NPM_DIR}/pseudocode.mjs" "${PSEUDOCODE_NPM_DIR}/cli.mjs"
+		COMMENT "Packing the npm package"
+		VERBATIM)
+	add_custom_target(npm_package ALL DEPENDS "${PSEUDOCODE_NPM_TARBALL}")
+else()
+	message(STATUS "npm package skipped: npm not found beside ${PSEUDOCODE_NODE}")
+endif()

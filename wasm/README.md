@@ -7,7 +7,7 @@ emcmake cmake -S . -B build-wasm
 cmake --build build-wasm
 ```
 
-This builds the same interpreter in two forms. It is an optimised (Release) build unless `CMAKE_BUILD_TYPE` says otherwise.
+This builds the same interpreter in two forms, and packs both into the npm package `build-wasm/pseudocode-interpreter-VERSION.tgz` (see below). It is an optimised (Release) build unless `CMAKE_BUILD_TYPE` says otherwise.
 
 ## On the command line, with Node.js
 
@@ -64,4 +64,30 @@ cmake --build build-wasm
 ctest --test-dir build-wasm
 ```
 
-These test the command line form. The web module was checked by hand, in Node and in Chrome, with the example page and the cases above.
+These test the command line form. To test the npm package as well, in Node.js and in Chromium, add `-DPSEUDOCODE_PACKAGE_TESTS=ON` (see `tests/README.md`).
+
+## The npm package
+
+The build packs the npm package [`pseudocode-interpreter`](https://www.npmjs.com/package/pseudocode-interpreter) into `build-wasm/pseudocode-interpreter-VERSION.tgz`, staged first in `build-wasm/npm`. It holds both forms of the interpreter: `pseudocode.mjs` for code, with its types in `pseudocode.d.mts`, and the `pseudocode` command (`cli.mjs`). Its README, the one npm shows, is `npm/README.md`; its `package.json` is made from `npm/package.json.in`.
+
+The version is the `VERSION` in `CMakeLists.txt`, and the oldest Node.js it supports is `PSEUDOCODE_NODE_ENGINES` in `Wasm.cmake`.
+
+### Publishing a release
+
+Releases are published by hand, from a clean checkout of `main` whose CI has passed:
+
+1. Set the new version in `CMakeLists.txt` (npm will not publish the same version twice), and commit and push it.
+2. Build and test the package:
+   ```
+   cmake -S . -B build && cmake --build build
+   emcmake cmake -S . -B build-wasm -DPSEUDOCODE_TEST_RUNNER=$PWD/build/tests/program_tests -DPSEUDOCODE_PACKAGE_TESTS=ON
+   cmake --build build-wasm
+   ctest --test-dir build-wasm
+   ```
+3. Check what will be uploaded, then publish it (`npm login` first, once). The path needs its leading `./`, or npm reads it as a GitHub repository:
+   ```
+   npm publish --dry-run ./build-wasm/pseudocode-interpreter-1.0.0.tgz
+   npm publish ./build-wasm/pseudocode-interpreter-1.0.0.tgz
+   ```
+4. Tag the release: `git tag v1.0.0 && git push origin v1.0.0`.
+

@@ -1,5 +1,6 @@
+#!/usr/bin/env node
 // Runs PseudocodeInterpreter.js, the interpreter compiled to WebAssembly,
-// with Node.js: node pseudocode-cli.mjs [options] [file]
+// with Node.js: node cli.mjs [options] [file] (pseudocode-cli.mjs in build-wasm)
 //
 // WebAssembly calls use the JavaScript engine's own stack as well as their
 // own (STACK_SIZE in Wasm.cmake), and Node's main thread has about 1 MB of

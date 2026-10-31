@@ -1,0 +1,45 @@
+{
+	"name": "pseudocode-interpreter",
+	"version": "@PROJECT_VERSION@",
+	"description": "An interpreter for Cambridge International A Level (9618) pseudocode, compiled to WebAssembly. Runs in web pages, Web Workers and Node.js, and on the command line.",
+	"keywords": [
+		"pseudocode",
+		"interpreter",
+		"9618",
+		"a-level",
+		"computer-science",
+		"education",
+		"webassembly"
+	],
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/11xdeveloper/pseudocode-interpreter.git"
+	},
+	"homepage": "https://github.com/11xdeveloper/pseudocode-interpreter",
+	"bugs": "https://github.com/11xdeveloper/pseudocode-interpreter/issues",
+	"exports": {
+		".": {
+			"types": "./pseudocode.d.mts",
+			"default": "./pseudocode.mjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"types": "./pseudocode.d.mts",
+	"bin": {
+		"pseudocode": "cli.mjs"
+	},
+	"files": [
+		"pseudocode.mjs",
+		"pseudocode.d.mts",
+		"pseudocode-core.mjs",
+		"pseudocode-core.wasm",
+		"cli.mjs",
+		"PseudocodeInterpreter.js",
+		"PseudocodeInterpreter.wasm"
+	],
+	"sideEffects": false,
+	"engines": {
+		"node": "@PSEUDOCODE_NODE_ENGINES@"
+	}
+}
